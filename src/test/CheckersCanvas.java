@@ -101,7 +101,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	  }
 	  board.setUpGame();
 	  currentPlayer = CheckersData.RED;
-	  firstAI = new AI(CheckersData.BLACK, currentPlayer, "C:\\dev\\CS175---Combat-Checkers\\text.txt");
+	  firstAI = new AI(CheckersData.BLACK, currentPlayer, System.getenv("APPDATA") + "\\Combat Checkers\\text.txt");
 	  legalMoves = board.getLegalMoves(CheckersData.RED);  // Get RED's legal moves.
 	 selectedRow = -1;   // RED has not yet selected a piece to move.
 	 message.setText("Red:  Make your move.");
@@ -118,8 +118,8 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	  }
 	  board.setUpGame();
 	  currentPlayer = CheckersData.RED;
-	  firstAI = new AI(currentPlayer, CheckersData.BLACK, "C:\\dev\\CS175---Combat-Checkers\\text.txt");
-	  secondAI = new AI(CheckersData.BLACK, currentPlayer, "C:\\dev\\CS175---Combat-Checkers\\text2.txt");
+	  firstAI = new AI(currentPlayer, CheckersData.BLACK, System.getenv("APPDATA") + "\\Combat Checkers\\text.txt");
+	  secondAI = new AI(CheckersData.BLACK, currentPlayer, System.getenv("APPDATA") + "\\Combat Checkers\\text2.txt");
 	  legalMoves = board.getLegalMoves(CheckersData.RED);
 	  selectedRow = -1;
 	  message.setText("Red: Make your move.");
