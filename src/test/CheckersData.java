@@ -15,6 +15,11 @@ class CheckersData {
      in the game.
  */
 
+private int RED_MEN;
+private int RED_KINGS;
+private int BLACK_MEN;
+private int BLACK_KINGS;
+	
  public static final int
            EMPTY = 0,
            RED = 1,
@@ -28,6 +33,10 @@ class CheckersData {
  public CheckersData() {
        // Constructor.  Create the board and set it up for a new game.
     board = new int[8][8];
+    RED_MEN = 12;
+    BLACK_MEN = 12;
+    RED_KINGS = 0;
+    BLACK_KINGS = 0;
     setUpGame();
  }
  
@@ -132,12 +141,35 @@ class CheckersData {
           // The move is a jump.  Remove the jumped piece from the board.
        int jumpRow = (fromRow + toRow) / 2;  // Row of the jumped piece.
        int jumpCol = (fromCol + toCol) / 2;  // Column of the jumped piece.
+       int jumped = board[jumpRow][jumpCol];
        board[jumpRow][jumpCol] = EMPTY;
+       
+       switch(jumped) {
+       case 1:
+    	   RED_MEN--;
+    	   break;
+       case 2:
+    	   RED_KINGS--;
+    	   break;
+       case 3:
+    	   BLACK_MEN--;
+    	   break;
+       case 4:
+    	   BLACK_KINGS--;
+    	   break;
+       }
+       
     }
-    if (toRow == 0 && board[toRow][toCol] == RED)
+    if (toRow == 0 && board[toRow][toCol] == RED) {
        board[toRow][toCol] = RED_KING;
-    if (toRow == 7 && board[toRow][toCol] == BLACK)
+       RED_KINGS++;
+       RED_MEN--;
+    }
+    if (toRow == 7 && board[toRow][toCol] == BLACK) {
        board[toRow][toCol] = BLACK_KING;
+       BLACK_KINGS++;
+       BLACK_MEN--;
+    }
  }
  
 
@@ -159,7 +191,7 @@ class CheckersData {
     else
        playerKing = BLACK_KING;
 
-    Vector moves = new Vector();  // Moves will be stored in this vector.
+    Vector<CheckersMove> moves = new Vector<CheckersMove>();  // Moves will be stored in this vector.
     
     /*  First, check for any possible jumps.  Look at each square on the board.
         If that square contains one of the player's pieces, look at a possible
@@ -314,30 +346,20 @@ class CheckersData {
  }  // end canMove()
  
 
- public int numRedPieces() {
-	 int red = 0;
-	 for(int row = 0; row < 8; row++)
-		 for(int col = 0; col < 8; col++)
-			 if(col % 2 == row % 2)
-				 if(board[row][col] == RED)
-					 red++;
-				 else if(board[row][col] == RED_KING)
-					 red++;
-	 
-	 return red;
+ public int numRedMen() {
+	 return RED_MEN;
  }
  
- public int numBlackPieces() {
-	 int black = 0;
-	 for(int row = 0; row < 8; row++)
-		 for(int col = 0; col < 8; col++)
-			 if(col % 2 == row % 2)
-				 if(board[row][col] == BLACK)
-					 black++;
-				 else if(board[row][col] == BLACK_KING)
-					 black++;
-	 
-	 return black;
+ public int numRedKings() {
+	 return RED_KINGS;
+ }
+ 
+ public int numBlackMen() {
+	 return BLACK_MEN;
+ }
+ 
+ public int numBlackKings() {
+	 return BLACK_KINGS;
  }
  
 } // end class CheckersData

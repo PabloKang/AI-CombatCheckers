@@ -230,8 +230,8 @@ public class AI {
 	
 	private int calcPieceDifference(CheckersData board, boolean MAX) {
 		int diff;
-		int black = board.numBlackPieces();
-		int red = board.numRedPieces();
+		int black = board.numBlackMen();
+		int red = board.numRedMen();
 		if(player == CheckersData.RED) {
 			if(MAX) {
 				diff = red - black;
