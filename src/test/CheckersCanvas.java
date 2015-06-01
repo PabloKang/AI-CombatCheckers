@@ -1,16 +1,15 @@
 package test;
 
-import java.awt.Button;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import javax.swing.*;
 
 class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 
@@ -20,11 +19,11 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
     // the work of letting the users play checkers, and it displays
     // the checkerboard.
 
-  Button resignButton;   // Current player can resign by clicking this button.
-  Button newGameButton;  // This button starts a new game.  It is enabled only
+  JButton resignButton;   // Current player can resign by clicking this button.
+  JButton newGameButton;  // This button starts a new game.  It is enabled only
                          //     when the current game has ended.
   
-  Label message;   // A label for displaying messages to the user.
+  JLabel message;   // A label for displaying messages to the user.
   
   CheckersData board;  // The data for the checkers board is kept here.
                        //    This board is also responsible for generating
@@ -54,11 +53,11 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
      setBackground(Color.black);
      addMouseListener(this);
      setFont(new  Font("Serif", Font.BOLD, 14));
-     resignButton = new Button("Resign");
+     resignButton = new JButton("Resign");
      resignButton.addActionListener(this);
-     newGameButton = new Button("New Game");
+     newGameButton = new JButton("New Game");
      newGameButton.addActionListener(this);
-     message = new Label("",Label.CENTER);
+     message = new JLabel("", JLabel.CENTER);
      board = new CheckersData();
      doNewAIGame();
   }
@@ -102,7 +101,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	  }
 	  board.setUpGame();
 	  currentPlayer = CheckersData.RED;
-	  firstAI = new AI(CheckersData.BLACK, currentPlayer, "C:\\Users\\Alex Block\\Documents\\GitHub\\CS-175---Group-AI-Project\\src\\test\\text.txt");
+	  firstAI = new AI(CheckersData.BLACK, currentPlayer, "C:\\dev\\CS175---Combat-Checkers\\text.txt");
 	  legalMoves = board.getLegalMoves(CheckersData.RED);  // Get RED's legal moves.
 	 selectedRow = -1;   // RED has not yet selected a piece to move.
 	 message.setText("Red:  Make your move.");
@@ -119,8 +118,8 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	  }
 	  board.setUpGame();
 	  currentPlayer = CheckersData.RED;
-	  firstAI = new AI(currentPlayer, CheckersData.BLACK, "C:\\Users\\Alex Block\\Documents\\GitHub\\CS-175---Group-AI-Project\\src\\test\\text.txt");
-	  secondAI = new AI(CheckersData.BLACK, currentPlayer, "C:\\Users\\Alex Block\\Documents\\GitHub\\CS-175---Group-AI-Project\\src\\test\\text2.txt");
+	  firstAI = new AI(currentPlayer, CheckersData.BLACK, "C:\\dev\\CS175---Combat-Checkers\\text.txt");
+	  secondAI = new AI(CheckersData.BLACK, currentPlayer, "C:\\dev\\CS175---Combat-Checkers\\text2.txt");
 	  legalMoves = board.getLegalMoves(CheckersData.RED);
 	  selectedRow = -1;
 	  message.setText("Red: Make your move.");
