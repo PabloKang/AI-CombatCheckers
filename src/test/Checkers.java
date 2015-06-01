@@ -13,10 +13,10 @@ package test;
 */
 
 import java.awt.*;
-import java.applet.*;
+import javax.swing.*;
 
 
-public class Checkers extends Applet {
+public class Checkers extends JPanel {
 
    /* The main applet class only lays out the applet.  The work of
       the game is all done in the CheckersCanvas object.   Note that
@@ -25,11 +25,37 @@ public class Checkers extends Applet {
       class gives them their visual appearance and sets their
       size and positions.*/
 
-   public void init() {
-   
+   public static void main (String[] args) {
+      JFrame window = new JFrame("Combat Checkers");
+      Checkers content = new Checkers();
+      window.setContentPane(content);
+      window.pack();
+      Dimension screensize = Toolkit.getDefaultToolkit().getScreenSize();
+      window.setLocation((screensize.width - window.getWidth())/2, (screensize.height - window.getHeight())/2);
+      window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+      window.setResizable(false);
+
+      window.addWindowListener(new java.awt.event.WindowAdapter() {
+         public void windowClosing (java.awt.event.WindowEvent evt) {
+            //CheckersCanvas.firstAI.dumpToFile();
+            //CheckersCanvas.secondAI.dumpToFile();
+         }
+      });
+
+      window.setVisible(true);
+   }
+
+   public static class Applet extends JApplet {
+      public void init () {
+         setContentPane(new Checkers());
+      }
+   }
+
+   public Checkers () {
       setLayout(null);  // I will do the layout myself.
+      setPreferredSize(new Dimension(350, 250));
    
-      setBackground(new Color(0,150,0));  // Dark green background.
+      setBackground(new Color(0, 102,0));  // Dark green background.
       
       /* Create the components and add them to the applet. */
 
@@ -57,10 +83,4 @@ public class Checkers extends Applet {
       board.message.setBounds(0, 200, 330, 30);
       resize(350,250);
    }
-   
-   public void destroy() {
-	   CheckersCanvas.firstAI.dumpToFile();
-	   CheckersCanvas.secondAI.dumpToFile();
-   }
-   
 } // end class Checkers
