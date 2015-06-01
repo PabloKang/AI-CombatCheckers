@@ -1,0 +1,8 @@
+Board Representation
+
+'w' = white checkers piece (not kinged)
+'W' = kinged white checkers piece
+'b' = black checkers piece (not kinged)
+'B' = kinged black checkers piece
+
+Move Representations
