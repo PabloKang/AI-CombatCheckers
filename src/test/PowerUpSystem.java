@@ -41,13 +41,13 @@ class PowerUpSystem {
 	 }
 	 
 	 // Roll. If true, spawn a power-up on a random empty tile on the board.
-	 public int[][] spawnRoll(int[][] board)
+	 public CheckersData spawnRoll(CheckersData board)
 	 {
 		 return board;
 	 }
 	 
 	 // Execute a power from the user to the target.
-	 public int[][] usePower(int[][] board, Point user, Point target)
+	 public CheckersData usePower(CheckersData board, Point user, Point target)
 	 {
 		 return board;
 	 }

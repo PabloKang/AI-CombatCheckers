@@ -59,7 +59,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
      newGameButton.addActionListener(this);
      message = new JLabel("", JLabel.CENTER);
      board = new CheckersData();
-     doNewAIGame();
+     doNewGame();
   }
   
 
@@ -69,7 +69,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
      if (src == newGameButton)
         doNewGame();
      else if (src == resignButton)
-        doResignAI();
+        doResign();
   }
   
 
@@ -253,7 +253,6 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
            if(currentPlayer == firstAI.player) {
 	       		CheckersData copy = new CheckersData();
 	       		copy.setUpGame(board.getBoardCopy());
-	       		doMakeMove(firstAI.makeMove(copy));
        	   }
            repaint();
            return;
@@ -264,12 +263,10 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
         Get that player's legal moves.  If the player has no legal moves,
         then the game ends. */
      
-     if(currentPlayer == firstAI.player) {
 	     if (currentPlayer == CheckersData.RED) {
 	        currentPlayer = CheckersData.BLACK;
 	        legalMoves = board.getLegalMoves(currentPlayer);
 	        if (legalMoves == null) {
-	           firstAI.wonGame();
 	           gameOver("BLACK has no moves.  RED wins.");
 	           return;
 	        }
@@ -282,7 +279,6 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	        currentPlayer = CheckersData.RED;
 	        legalMoves = board.getLegalMoves(currentPlayer);
 	        if (legalMoves == null) {
-	           firstAI.wonGame();
 	           gameOver("RED has no moves.  BLACK wins.");
 	           return;
 	        }
@@ -311,71 +307,34 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	        }
 	     }
 	     repaint();
-     }
-     else {
-    	 if (currentPlayer == CheckersData.RED) {
- 	        currentPlayer = CheckersData.BLACK;
- 	        legalMoves = board.getLegalMoves(currentPlayer);
- 	        if (legalMoves == null) {
- 	           firstAI.lostGame();
- 	           gameOver("BLACK has no moves.  RED wins.");
- 	          System.out.println("null case");
- 	          return;
- 	        }
- 	        else if (legalMoves[0].isJump()) {
- 	           message.setText("BLACK:  Make your move.  You must jump.");
- 	           System.out.println("isJump Case");
- 	        }
- 	        else {
- 	           message.setText("BLACK:  Make your move.");
- 	          System.out.println("final case");
- 	        }
- 	     }
- 	     else {
- 	        currentPlayer = CheckersData.RED;
- 	        legalMoves = board.getLegalMoves(currentPlayer);
- 	        if (legalMoves == null) {
- 	           firstAI.lostGame();
- 	           gameOver("RED has no moves.  BLACK wins.");
- 	           return;
- 	        }
- 	        else if (legalMoves[0].isJump())
- 	           message.setText("RED:  Make your move.  You must jump.");
- 	        else
- 	           message.setText("RED:  Make your move.");
- 	     }
-    	 repaint();
-    	 CheckersData copy = new CheckersData();
-    	 copy.setUpGame(board.getBoardCopy());
-    	 doMakeMove(firstAI.makeMove(copy));
-      }
+
      
      /* Set selectedRow = -1 to record that the player has not yet selected
          a piece to move. */
      
-//     selectedRow = -1;
-//     
-//     /* As a courtesy to the user, if all legal moves use the same piece, then
-//        select that piece automatically so the use won't have to click on it
-//        to select it. */
-//     
-//     if (legalMoves != null) {
-//        boolean sameStartSquare = true;
-//        for (int i = 1; i < legalMoves.length; i++)
-//           if (legalMoves[i].fromRow != legalMoves[0].fromRow
-//                                || legalMoves[i].fromCol != legalMoves[0].fromCol) {
-//               sameStartSquare = false;
-//               break;
-//           }
-//        if (sameStartSquare) {
-//           selectedRow = legalMoves[0].fromRow;
-//           selectedCol = legalMoves[0].fromCol;
-//        }
-//     }
-//     
-//     /* Make sure the board is redrawn in its new state. */
-//     
-//     repaint();
+     selectedRow = -1;
+     
+     /* As a courtesy to the user, if all legal moves use the same piece, then
+        select that piece automatically so the use won't have to click on it
+        to select it. */
+     
+     if (legalMoves != null) {
+        boolean sameStartSquare = true;
+        for (int i = 1; i < legalMoves.length; i++)
+           if (legalMoves[i].fromRow != legalMoves[0].fromRow
+                                || legalMoves[i].fromCol != legalMoves[0].fromCol) {
+               sameStartSquare = false;
+               break;
+           }
+        if (sameStartSquare) {
+           selectedRow = legalMoves[0].fromRow;
+           selectedCol = legalMoves[0].fromCol;
+        }
+     }
+     
+     /* Make sure the board is redrawn in its new state. */
+     
+     repaint();
      
   }  // end doMakeMove();
   
