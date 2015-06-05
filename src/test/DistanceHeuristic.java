@@ -9,7 +9,7 @@ public class DistanceHeuristic {
 			for (int x = 0; x < 8; ++x) {
 				for (int y = 0; y < 8; ++y) {
 					if (board[x][y] == player) {
-						score += y;
+						score += 8 - y;
 					}
 				}
 			}
@@ -17,7 +17,7 @@ public class DistanceHeuristic {
 			for (int x = 0; x < 8; ++x) {
 				for (int y = 7; y >= 0; --y) {
 					if (board[x][y] == player) {
-						score += 8 - y;
+						score += y;
 					}
 				}
 			}
