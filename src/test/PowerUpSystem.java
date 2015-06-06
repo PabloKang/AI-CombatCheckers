@@ -10,47 +10,47 @@ import java.awt.Point;
 class PowerUpSystem {
 	
 // MEMBER VARIABLES
-	// PowerUp Types
-	 public static final int 
-		WEAPON = 10,
-		BUFF = 20,
-		HEX = 30;
+	// PowerUp types
+	public static final int 
+		WEAPON = 1,
+		BUFF = 2,
+		HEX = 3;
 	 
 	 // Weapons
-	 public static final int 
-		LASER = 10,
-		BOMB = 20,
-		AIR_STRIKE = 30;
+	public static final int 
+		LASER = 1,
+		BOMB = 2,
+		AIR_STRIKE = 3;
 	 
-	 // Buffs
-	 //	 public static final int 
+	// Buffs
+	//	 public static final int 
 
 	 
-	 // Hexes
-	 //	 public static final int 
+	// Hexes
+	//	 public static final int 
 	 
-	 // PowerUp look-up tables
-	 public HashMap<Point, Integer> p1_powers;
-	 public HashMap<Point, Integer> p2_powers;
+	// PowerUp look-up tables
+	public HashMap<Point, PowerUp> p1_powers;
+	public HashMap<Point, PowerUp> p2_powers;
 	 
-	 // PowerUpSelector
-	 private PowerUpSelector pSelector;
+	// PowerUpSelector
+	private PowerUpSelector pSelector;
 	 
 
 // MEMBER FUNCTIONS
-	 // Constructor
-	 public PowerUpSystem() 
-	 {
-		 p1_powers = new HashMap<Point, Integer>();
-		 p2_powers = new HashMap<Point, Integer>();
-		 
-		 pSelector = new PowerUpSelector();
-	 }
-	 
-	 public PowerUp getRandomPowerUp()
-	 {
-		 return pSelector.getRandom();
-	 }
+	// Constructor
+	public PowerUpSystem() 
+	{
+		p1_powers = new HashMap<Point, PowerUp>();
+		p2_powers = new HashMap<Point, PowerUp>();
+		
+		pSelector = new PowerUpSelector();
+	}
+	
+	public PowerUp getRandomPowerUp(int type)
+	{
+		return pSelector.randomPowerUp(type);
+	}
 	 
 //	 // Roll. If true, spawn a power-up on a random empty tile on the board.
 //	 public CheckersData spawnRoll(CheckersData board)
@@ -64,6 +64,7 @@ class PowerUpSystem {
 //		 return board;
 //	 }
 	 
+
 	 
 	 
 } // END CLASS :----------------------------------------------------------------
@@ -74,8 +75,10 @@ class PowerUpSystem {
 class PowerUpSelector {
     
 	ArrayList<PowerUp> weapons = new ArrayList<PowerUp>();
+	ArrayList<PowerUp> buffs = new ArrayList<PowerUp>();
+	ArrayList<PowerUp> hexes = new ArrayList<PowerUp>();
 
-    int totalSum = 0;
+    int totalSum = 100;
     Random rand = new Random();
 
     PowerUpSelector() 
@@ -83,21 +86,35 @@ class PowerUpSelector {
     	weapons.add(new Laser(60));
     	weapons.add(new Bomb(30));
     	weapons.add(new AirStrike(10));
-    	
-        for(PowerUp weapon : weapons) {
-            totalSum = totalSum + weapon.getProbability();
-        }
     }
 
-    public PowerUp getRandom() {
+    public PowerUp randomPowerUp(int type) {
 
         int index = rand.nextInt(totalSum);
         int sum = 0;
         int i=0;
-        while(sum < index ) {
-             sum = sum + weapons.get(i++).getProbability();
+        
+        if(type == PowerUpSystem.WEAPON) {
+            while(sum < index ) {
+                sum = sum + weapons.get(i++).getProbability();
+           }
+           return weapons.get(Math.max(0,i-1));
         }
-        return weapons.get(Math.max(0,i-1));
+        else if(type == PowerUpSystem.BUFF) {
+            while(sum < index ) {
+                sum = sum + buffs.get(i++).getProbability();
+           }
+           return buffs.get(Math.max(0,i-1));
+        }
+        else if(type == PowerUpSystem.HEX) {
+            while(sum < index ) {
+                sum = sum + hexes.get(i++).getProbability();
+           }
+           return hexes.get(Math.max(0,i-1));
+        }
+        else {
+        	return null;
+        }
     }
     
 } // END CLASS :----------------------------------------------------------------

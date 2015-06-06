@@ -5,6 +5,7 @@ import java.awt.Point;
 public abstract class PowerUp {
 
 	private int probability;
+	public int id = 0;
 	public String type = "unknown";
 
 	// Constructor
