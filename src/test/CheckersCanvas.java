@@ -293,7 +293,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		// This is called when the current player has chosen the specified
 		// move.  Make the move, and then either end or continue the game
 		// appropriately.
-		
+		turnNumber++;
 		board.makeMove(move);
 		
 		// Check if PowerUp needs to spawn
