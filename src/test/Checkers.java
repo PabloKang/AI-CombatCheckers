@@ -14,6 +14,7 @@ package test;
 
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 
 public class Checkers extends JPanel {
@@ -33,12 +34,11 @@ public class Checkers extends JPanel {
       Dimension screensize = Toolkit.getDefaultToolkit().getScreenSize();
       window.setLocation((screensize.width - window.getWidth())/2, (screensize.height - window.getHeight())/2);
       window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-      window.setResizable(false);
 
       window.addWindowListener(new java.awt.event.WindowAdapter() {
          public void windowClosing (java.awt.event.WindowEvent evt) {
-            //CheckersCanvas.firstAI.dumpToFile();
-            //CheckersCanvas.secondAI.dumpToFile();
+            if(CheckersCanvas.firstAI != null) CheckersCanvas.firstAI.dumpToFile();
+            if(CheckersCanvas.secondAI != null) CheckersCanvas.secondAI.dumpToFile();
          }
       });
 
@@ -52,35 +52,56 @@ public class Checkers extends JPanel {
    }
 
    public Checkers () {
-      setLayout(null);  // I will do the layout myself.
-      setPreferredSize(new Dimension(350, 250));
-   
-      setBackground(new Color(0, 102,0));  // Dark green background.
-      
-      /* Create the components and add them to the applet. */
+	   setLayout(new GridBagLayout());
+	      setPreferredSize(new Dimension(500, 400));
 
-      CheckersCanvas board = new CheckersCanvas();
-          // Note: The constructor creates the buttons board.resignButton
-          // and board.newGameButton and the Label board.message.
-      add(board);
+	      GridBagConstraints c = new GridBagConstraints();
+	   
+	      setBackground(new Color(0, 102, 0));
+	      CheckersCanvas board = new CheckersCanvas();
 
-      board.newGameButton.setBackground(Color.lightGray);
-      add(board.newGameButton);
+	      c.gridx = 0;
+	      c.gridy = 0;
+	      c.gridwidth = 1;
+	      c.gridheight = 4;
+	      c.insets = new Insets(5, 5, 5, 5);
+	      c.weightx = 1;
+	      c.weighty = 1;
+	      c.fill = GridBagConstraints.BOTH;
+	      add(board, c);
 
-      board.resignButton.setBackground(Color.lightGray);
-      add(board.resignButton);
+	      c.gridx = 1;
+	      c.gridy = 0;
+	      c.gridwidth = 1;
+	      c.gridheight = 1;
+	      c.weightx = 0;
+	      c.weighty = 0;
+	      c.fill = GridBagConstraints.HORIZONTAL;
+	      board.newGameButton.setBackground(new Color(238, 238, 238));
+	      add(board.newGameButton, c);
 
-      board.message.setForeground(Color.green);
-      board.message.setFont(new Font("Serif", Font.BOLD, 14));
-      add(board.message);
-      
-      /* Set the position and size of each component by calling
-         its setBounds() method. */
+	      c.gridx = 1;
+	      c.gridy = 1;
+	      c.gridwidth = 1;
+	      c.gridheight = 1;
+	      c.weightx = 0;
+	      c.weighty = 0;
+	      c.fill = GridBagConstraints.HORIZONTAL;
+	      board.resignButton.setBackground(new Color(238, 238, 238));
+	      add(board.resignButton, c);
 
-      board.setBounds(20,20,164,164); // Note:  size MUST be 164-by-164 !
-      board.newGameButton.setBounds(210, 60, 100, 30);
-      board.resignButton.setBounds(210, 120, 100, 30);
-      board.message.setBounds(0, 200, 330, 30);
-      resize(350,250);
+	      c.gridx = 0;
+	      c.gridy = 4;
+	      c.gridwidth = 2;
+	      c.gridheight = 1;
+	      c.insets = new Insets(5, 0, 0, 0);
+	      c.weightx = 1;
+	      c.weighty = 0;
+	      c.fill = GridBagConstraints.BOTH;
+	      board.message.setOpaque(true);
+	      board.message.setBackground(new Color(238, 238, 238));
+	      board.message.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
+	      board.message.setBorder(new EmptyBorder(5, 5, 5, 5));
+	      add(board.message, c);
    }
 } // end class Checkers

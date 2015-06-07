@@ -20,4 +20,8 @@ class CheckersMove {
 		// rows.  (In a regular move, it only moves one row.)
 		return (fromRow - toRow == 2 || fromRow - toRow == -2);
 	}
+	boolean isEqual(CheckersMove m) {
+		return (fromRow == m.fromRow && fromCol == m.fromCol
+				&& toRow == m.toRow && toCol == m.toCol);
+	}
 }  // end class CheckersMove.

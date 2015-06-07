@@ -1,8 +1,8 @@
 package test;
 
 public class DistanceHeuristic {
-	public static int calc (CheckersData state, int player, boolean MAX) {
-		int score = 0;
+	public static double calc (CheckersData state, int player, boolean MAX) {
+		double score = 0.0;
 		int[][] board = state.getBoardCopy();
 
 		if (player == CheckersData.RED) {
@@ -22,6 +22,11 @@ public class DistanceHeuristic {
 				}
 			}
 		}
+		
+		if(player == CheckersData.RED)
+			score = score / state.numRedMen();
+		else 
+			score = score / state.numBlackMen();
 
 		return score;
 	}
