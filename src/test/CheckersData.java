@@ -315,7 +315,7 @@ class CheckersData {
 		playerKing = RED_KING;
 		else
 		playerKing = BLACK_KING;
-		Vector moves = new Vector();  // The legal jumps will be stored in this vector.
+		Vector<CheckersMove> moves = new Vector<CheckersMove>();  // The legal jumps will be stored in this vector.
 		if (board[row][col] == player || board[row][col] == playerKing) {
 			if (canJump(player, row, col, row+1, col+1, row+2, col+2))
 			moves.addElement(new CheckersMove(row, col, row+2, col+2));
