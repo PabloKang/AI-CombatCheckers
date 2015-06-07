@@ -76,7 +76,6 @@ public class AI {
 		}
 		finally {
 			inputReader.close();
-			System.out.println(weightedMoves.size());
 		}
 	} // end AI()
 
