@@ -9,6 +9,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+
 import javax.swing.*;
 
 class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
@@ -31,6 +38,8 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 
 	public static AI firstAI;
 	public static AI secondAI;
+	
+	public static int turnNumber = 0;
 
 	boolean gameInProgress; // Is a game currently in progress?
 
@@ -45,7 +54,8 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	CheckersMove[] legalMoves;  // An array containing the legal moves for the
 	//   current player.
 
-
+	int winner;
+	
 	public CheckersCanvas() {
 		// Constructor.  Create the buttons and lable.  Listen for mouse
 		// clicks and for clicks on the buttons.  Create the board and
@@ -59,28 +69,129 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		newGameButton.addActionListener(this);
 		message = new JLabel("", JLabel.CENTER);
 		board = new CheckersData();
-		doNewGame();
+		doNewAIvsAIGame();
 	}
 
+	public void outputResult(String output, int ai) {
+		try {
+			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(output, true)));
+			switch(ai) {
+			case 1:
+				switch(winner) {
+				case 0:
+					out.print("Draw ");
+					break;
+				case 1:
+					out.print("AI ");
+					break;
+				case 2:
+					out.print("Random ");
+					break;
+				}
+				break;
+			case 2:
+				switch(winner) {
+				case 0:
+					out.print("Draw ");
+					break;
+				case 1:
+					out.print("Random ");
+					break;
+				case 2:
+					out.print("AI ");
+					break;
+				}
+				break;
+			case 0:
+				switch(winner) {
+				case 0:
+					out.print("Draw ");
+					break;
+				case 1:
+					out.print("Red ");
+					break;
+				case 2:
+					out.print("Black ");
+					break;
+				}
+			}
+			out.println(turnNumber);
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
+	}
+	
 	public void actionPerformed(ActionEvent evt) {
 		// Respond to user's click on one of the two buttons.
 		Object src = evt.getSource();
 		if (src == newGameButton)
-		doNewGame();
+			doNewGame();
 		else if (src == resignButton)
-		doResign();
+			doResign();
+			
 	}
 
-
+	void trainAI() {
+		for(int i = 0; i < 500; i++) {
+			System.out.print("Red vs Random | i = ");
+			System.out.println(i);
+			while(gameInProgress) {
+				turnNumber++;
+				if(currentPlayer == firstAI.player)
+					doMakeMoveAIvsAI(firstAI.makeMove(board));
+				else
+					doMakeMoveAIvsAI(secondAI.makeRandomMove(board));
+			}
+			outputResult(System.getenv("APPDATA") + "\\Combat Checkers\\RedvsRand.txt", 1);
+			doNewGame();
+			if(i%2 == 0)
+				currentPlayer = CheckersData.BLACK;
+		}
+		for(int i = 0; i < 500; i++) {
+			System.out.print("Random vs Black | i = ");
+			System.out.println(i);
+			while(gameInProgress) {
+				turnNumber++;
+				if(currentPlayer == firstAI.player)
+					doMakeMoveAIvsAI(firstAI.makeRandomMove(board));
+				else
+					doMakeMoveAIvsAI(secondAI.makeMove(board));
+			}
+			outputResult(System.getenv("APPDATA") + "\\Combat Checkers\\RandvsBlack.txt", 2);
+			doNewGame();
+			if(i%2 == 0)
+				currentPlayer = CheckersData.BLACK;
+		}
+		for(int i = 0; i < 100; i++) {
+			System.out.print("Red vs Black | i = ");
+			System.out.println(i);
+			while(gameInProgress) {
+				turnNumber++;
+				if(currentPlayer == firstAI.player)
+					doMakeMoveAIvsAI(firstAI.makeMove(board));
+				else
+					doMakeMoveAIvsAI(secondAI.makeMove(board));
+			}
+			outputResult(System.getenv("APPDATA") + "\\Combat Checkers\\RedvsBlack.txt", 0);
+			doNewGame();
+			if(i%2 == 0)
+				currentPlayer = CheckersData.BLACK;
+		}
+		System.out.println("done training");
+	}
+	
 	void doNewGame() {
 		// Begin a new game.
-		if (gameInProgress == true) {
+		if (gameInProgress) {
 			// This should not be possible, but it doens't 
 			// hurt to check.
 			message.setText("Finish the current game first!");
 			return;
 		}
+		turnNumber = 0;
 		board.setUpGame();   // Set up the pieces.
 		currentPlayer = CheckersData.RED;   // RED moves first.
 		legalMoves = board.getLegalMoves(CheckersData.RED);  // Get RED's legal moves.
@@ -99,6 +210,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			message.setText("Finish the current game first!");
 			return;
 		}
+		turnNumber = 0;
 		board.setUpGame();
 		currentPlayer = CheckersData.RED;
 		firstAI = new AI(CheckersData.BLACK, currentPlayer, System.getenv("APPDATA") + "\\Combat Checkers\\text.txt");
@@ -116,6 +228,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			message.setText("Finish the current game first!");
 			return;
 		}
+		turnNumber = 0;
 		board.setUpGame();
 		currentPlayer = CheckersData.RED;
 		firstAI = new AI(currentPlayer, CheckersData.BLACK, System.getenv("APPDATA") + "\\Combat Checkers\\text.txt");
@@ -128,6 +241,8 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		resignButton.setEnabled(true);
 		repaint();
 	}
+	
+
 
 	void doResign() {
 		// Current player resigns.  Game ends.  Opponent wins.
@@ -136,9 +251,9 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			return;
 		}
 		if (currentPlayer == CheckersData.RED) 
-		gameOver("RED resigns.  BLACK wins.");         
+			gameOver("RED resigns.  BLACK wins.");         
 		else
-		gameOver("BLACK resigns.  RED wins.");
+			gameOver("BLACK resigns.  RED wins.");
 	}
 
 	void doResignAI() {
@@ -149,21 +264,36 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		if (currentPlayer == CheckersData.RED) {
 			gameOver("RED resigns.  BLACK wins.");
 			if(currentPlayer == firstAI.player)
-			firstAI.lostGame();
+				firstAI.lostGame();
 			else
-			firstAI.wonGame();
+				firstAI.wonGame();
 		}
 		else {
 			gameOver("BLACK resigns.  RED wins.");
 			if(currentPlayer == firstAI.player)
-			firstAI.lostGame();
+				firstAI.lostGame();
 			else
-			firstAI.wonGame();
+				firstAI.wonGame();
 		}
 	}
 
 	void doResignAIvsAI() {
+		if(currentPlayer == CheckersData.RED)
+			gameOver("RED resigns. BLACK wins.");
+		else
+			gameOver("BLACK resigns. RED wins.");
 		
+		if(currentPlayer == firstAI.player) {
+			firstAI.lostGame();
+			secondAI.wonGame();
+			winner = 2;
+		}
+		else {
+			secondAI.lostGame();
+			firstAI.wonGame();
+			winner = 1;
+		}
+		gameInProgress = false;
 	}
 
 	void gameOver(String str) {
@@ -176,7 +306,86 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		gameInProgress = false;
 	}
 	
-
+	boolean drawDetection(CheckersMove move) {
+		ArrayList<CheckersMove> p1 = new ArrayList<CheckersMove>();
+		ArrayList<CheckersMove> p2 = new ArrayList<CheckersMove>();
+		CheckersData copy = new CheckersData();
+		copy.setUpGame(board.getBoardCopy());
+		copy.makeMove(move);
+		if(currentPlayer == firstAI.player) {
+			p1.add(move);
+			for(int i = 1; i < 8; i++) {
+				CheckersMove m;
+				if(i%2 == 0) {
+					m = firstAI.makeMove(copy);
+					if(m == null)
+						return false;
+					p1.add(m);
+				}
+				else {
+					m = secondAI.makeMove(copy);
+					if(m == null)
+						return false;
+					p2.add(m);
+				}
+				copy.makeMove(m);
+			}
+		}
+		else {
+			p2.add(move);
+			for(int i = 1; i < 8; i++) {
+				CheckersMove m;
+				if(i%2 == 0) {
+					m = secondAI.makeMove(copy);
+					if(m == null)
+						return false;
+					p2.add(m);
+				}
+				else {
+					m = firstAI.makeMove(copy);
+					if(m == null)
+						return false;
+					p1.add(m);
+				}
+				copy.makeMove(m);
+			}
+		}
+		int p1move = 0;
+		int p2move = 0;
+		if(p1.get(0).isEqual(p1.get(1)))
+			p1move++;
+		if(p1.get(0).isEqual(p1.get(2)))
+			p1move++;
+		if(p1.get(0).isEqual(p1.get(3)))
+			p1move++;
+		if(p1.get(1).isEqual(p1.get(2)))
+			p1move++;
+		if(p1.get(1).isEqual(p1.get(3)))
+			p1move++;
+		if(p1.get(2).isEqual(p1.get(3)))
+			p1move++;
+		if(p2.get(0).isEqual(p2.get(1)))
+			p2move++;
+		if(p2.get(0).isEqual(p2.get(2)))
+			p2move++;
+		if(p2.get(0).isEqual(p2.get(3)))
+			p2move++;
+		if(p2.get(1).isEqual(p2.get(2)))
+			p2move++;
+		if(p2.get(1).isEqual(p2.get(3)))
+			p2move++;
+		if(p2.get(2).isEqual(p2.get(3)))
+			p2move++;
+//		System.out.print("p1move: ");
+//		System.out.print(p1move);
+//		System.out.print(" | p2move: ");
+//		System.out.println(p2move);
+		if(p1move >= 2 && p2move >= 2)
+			return true;
+		else return false;
+		
+	}
+	
 	void doClickSquare(int row, int col) {
 		// This is called by mousePressed() when a player clicks on the
 		// square in the specified row and col.  It has already been checked
@@ -192,9 +401,9 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			selectedRow = row;
 			selectedCol = col;
 			if (currentPlayer == CheckersData.RED)
-			message.setText("RED:  Make your move.");
+				message.setText("RED:  Make your move.");
 			else
-			message.setText("BLACK:  Make your move.");
+				message.setText("BLACK:  Make your move.");
 			repaint();
 			return;
 		}
@@ -227,11 +436,9 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 
 
 	void doMakeMove(CheckersMove move) {
-		// This is called when the current player has chosen the specified
-		// move.  Make the move, and then either end or continue the game
-		// appropriately.
+		// This is called when the current player has chosen the specified move.  Make the move, and then either end or continue the game appropriately.	
 
-		
+
 		board.makeMove(move);
 		
 		/* If the move was a jump, it's possible that the player has another
@@ -245,15 +452,11 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			legalMoves = board.getLegalJumpsFrom(currentPlayer,move.toRow,move.toCol);
 			if (legalMoves != null) {
 				if (currentPlayer == CheckersData.RED)
-				message.setText("RED:  You must continue jumping.");
+					message.setText("RED:  You must continue jumping.");
 				else
-				message.setText("BLACK:  You must continue jumping.");
+					message.setText("BLACK:  You must continue jumping.");
 				selectedRow = move.toRow;  // Since only one piece can be moved, select it.
 				selectedCol = move.toCol;
-				if(currentPlayer == firstAI.player) {
-					CheckersData copy = new CheckersData();
-					copy.setUpGame(board.getBoardCopy());
-				}
 				repaint();
 				return;
 			}
@@ -271,9 +474,9 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				return;
 			}
 			else if (legalMoves[0].isJump())
-			message.setText("BLACK:  Make your move.  You must jump.");
+				message.setText("BLACK:  Make your move.  You must jump.");
 			else
-			message.setText("BLACK:  Make your move.");
+				message.setText("BLACK:  Make your move.");
 		}
 		else {
 			currentPlayer = CheckersData.RED;
@@ -283,30 +486,11 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				return;
 			}
 			else if (legalMoves[0].isJump())
-			message.setText("RED:  Make your move.  You must jump.");
+				message.setText("RED:  Make your move.  You must jump.");
 			else
-			message.setText("RED:  Make your move.");
+				message.setText("RED:  Make your move.");
 		}
-		selectedRow = -1;
 		
-		/* As a courtesy to the user, if all legal moves use the same piece, then
-			select that piece automatically so the use won't have to click on it
-			to select it. */
-		
-		if (legalMoves != null) {
-			boolean sameStartSquare = true;
-			for (int i = 1; i < legalMoves.length; i++)
-			if (legalMoves[i].fromRow != legalMoves[0].fromRow
-					|| legalMoves[i].fromCol != legalMoves[0].fromCol) {
-				sameStartSquare = false;
-				break;
-			}
-			if (sameStartSquare) {
-				selectedRow = legalMoves[0].fromRow;
-				selectedCol = legalMoves[0].fromCol;
-			}
-		}
-		repaint();
 
 		
 		/* Set selectedRow = -1 to record that the player has not yet selected
@@ -339,6 +523,98 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	}  // end doMakeMove();
 
 	void doMakeMoveAIvsAI(CheckersMove move) {
+		if(move == null) {
+			doResignAIvsAI();
+			return;
+		}
+		if(turnNumber >= 50) {
+			if(drawDetection(move)) {
+				gameOver("Game is a draw.");
+				firstAI.drawGame();
+				secondAI.drawGame();
+				gameInProgress = false;
+				winner = 0;
+				return;
+			}
+		}
+		board.makeMove(move);
+//		try {
+//			System.out.println("Here");
+//			TimeUnit.SECONDS.sleep(1);
+//			repaint();
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		if(move.isJump()) {
+			legalMoves = board.getLegalJumpsFrom(currentPlayer,move.toRow, move.toCol);
+			if(legalMoves != null) {
+				if(currentPlayer == CheckersData.RED)
+					message.setText("RED: You must continue jumping.");
+				else
+					message.setText("BLACK: You must continue jumping.");
+				//selectedRow = move.toRow;
+				//selectedCol = move.toCol;
+				CheckersData copy = new CheckersData();
+				copy.setUpGame(board.getBoardCopy());
+				repaint();
+				return;
+			}
+		}
+		
+		if(currentPlayer == CheckersData.RED) {
+			currentPlayer = CheckersData.BLACK;
+			legalMoves = board.getLegalMoves(currentPlayer);
+			if(legalMoves == null) {
+				gameOver("BLACK has no moves. RED wins.");
+				secondAI.lostGame();
+				firstAI.wonGame();
+				winner = 1;
+//				repaint();
+				return;
+			}
+			else if(legalMoves[0].isJump())
+				message.setText("BLACK: Make your move. You must jump.");
+			else 
+				message.setText("BLACK: Make your move.");
+//			CheckersData copy = new CheckersData();
+//			copy.setUpGame(board.getBoardCopy());
+//			doMakeMoveAIvsAI(secondAI.makeMove(copy));
+		}
+		else {
+			currentPlayer = CheckersData.RED;
+			legalMoves = board.getLegalMoves(currentPlayer);
+			if(legalMoves == null) {
+				gameOver("RED has no moves. BLACK wins.");
+				firstAI.lostGame();
+				secondAI.wonGame();
+				winner = 2;
+//				repaint();
+				return;
+			}
+			else if(legalMoves[0].isJump()) 
+				message.setText("RED: Make your move. You must jump.");
+			else
+				message.setText("RED: Make your move.");
+//			CheckersData copy = new CheckersData();
+//			copy.setUpGame(board.getBoardCopy());
+//			doMakeMoveAIvsAI(firstAI.makeMove(copy));
+		}
+		/*selectedRow = -1;
+		if(legalMoves != null) {
+			boolean sameStartSquare = true;
+			for(int i = 1; i < legalMoves.length; i++)
+				if(legalMoves[i].fromRow != legalMoves[0].fromRow
+						|| legalMoves[i].fromCol != legalMoves[0].fromCol) {
+					sameStartSquare = false;
+					break;
+				}
+			if(sameStartSquare) {
+				selectedRow = legalMoves[0].fromRow;
+				selectedCol = legalMoves[0].fromCol;
+			}
+		}*/
+		repaint();
 		
 	}
 

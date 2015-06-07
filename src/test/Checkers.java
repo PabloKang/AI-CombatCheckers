@@ -37,8 +37,8 @@ public class Checkers extends JPanel {
 
       window.addWindowListener(new java.awt.event.WindowAdapter() {
          public void windowClosing (java.awt.event.WindowEvent evt) {
-            //CheckersCanvas.firstAI.dumpToFile();
-            //CheckersCanvas.secondAI.dumpToFile();
+            CheckersCanvas.firstAI.dumpToFile();
+            CheckersCanvas.secondAI.dumpToFile();
          }
       });
 
@@ -53,7 +53,7 @@ public class Checkers extends JPanel {
 
    public Checkers () {
       setLayout(null);  // I will do the layout myself.
-      setPreferredSize(new Dimension(350, 250));
+      setPreferredSize(new Dimension(470, 250));
    
       setBackground(new Color(0, 102,0));  // Dark green background.
       
@@ -69,6 +69,7 @@ public class Checkers extends JPanel {
 
       board.resignButton.setBackground(Color.lightGray);
       add(board.resignButton);
+      
 
       board.message.setForeground(Color.green);
       board.message.setFont(new Font("Serif", Font.BOLD, 14));
@@ -81,6 +82,6 @@ public class Checkers extends JPanel {
       board.newGameButton.setBounds(210, 60, 100, 30);
       board.resignButton.setBounds(210, 120, 100, 30);
       board.message.setBounds(0, 200, 330, 30);
-      resize(350,250);
+     // resize(350,250);
    }
 } // end class Checkers
