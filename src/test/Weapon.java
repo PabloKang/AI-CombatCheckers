@@ -3,10 +3,18 @@ package test;
 import java.awt.Point;
 
 // Abstract base weapon class
-public abstract class Weapon extends PowerUp {
+public class Weapon extends PowerUp {
 
 	Weapon(int prob) {
 		super(prob);
+		id = PowerUpSystem.WEAPON;
+		type = "weapon";
+	}
+
+	@Override
+	public CheckersData execute(CheckersData board, Point user, Point target) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
 
@@ -23,13 +31,13 @@ class Laser extends Weapon
 	}
 
 	// Execute Laser
-	public CheckersData execute(CheckersData board, Point user, Point trajectory)
+	public CheckersData execute(CheckersData board, Point user, Point target)
 	{
 		Point p = user;
 		int pCode;
 		
-		p.x += trajectory.x;
-		p.y += trajectory.y;
+		p.x += target.x;
+		p.y += target.y;
 		
 		while(p.x < board.WIDTH && p.x >= 0 && p.y < board.HEIGHT && p.y >= 0) {
 			pCode = board.pieceAt(p.y, p.x);
@@ -39,8 +47,8 @@ class Laser extends Weapon
 				break;
 			}
 			else{
-				p.x += trajectory.x;
-				p.y += trajectory.y;
+				p.x += target.x;
+				p.y += target.y;
 			}
 		}
 		return board;
@@ -60,7 +68,7 @@ class Bomb extends Weapon
 	}
 
 	// Execute Laser
-	public CheckersData execute(CheckersData board, Point user)
+	public CheckersData execute(CheckersData board, Point user, Point target)
 	{
 		return board;
 	}
@@ -79,7 +87,7 @@ class AirStrike extends Weapon
 	}
 
 	// Execute Laser
-	public CheckersData execute(CheckersData board, Point user)
+	public CheckersData execute(CheckersData board, Point user, Point target)
 	{
 		return board;
 	}

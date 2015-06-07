@@ -233,9 +233,8 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		
 		board.makeMove(move);
 		
-		
 		// Check if PowerUp needs to spawn
-		
+		board = board.powerUpSys.spawnPowerUp(board);
 		
 		/* If the move was a jump, it's possible that the player has another
 		jump.  Check for legal jumps starting from the square that the player

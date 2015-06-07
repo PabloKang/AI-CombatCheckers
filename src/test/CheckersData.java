@@ -26,7 +26,10 @@ class CheckersData {
 	RED = 1,
 	RED_KING = 2,
 	BLACK = 3,
-	BLACK_KING = 4;
+	BLACK_KING = 4,
+	FREE_WEAPON = 10,
+	FREE_BUFF = 20,
+	FREE_HEX = 30;
 	
 	public static final int
 	HEIGHT = 8,
@@ -213,7 +216,7 @@ class CheckersData {
 			int pType = parsePowerType(target);
 			
 			// Generate random PowerUp of pType
-			PowerUp pUp = powerUpSys.getRandomPowerUp(pType);
+			powerUpSys.listPowerUp(new Point(toCol,toRow), piece, powerUpSys.getRandomPowerUp(pType));
 		}
 	}
 

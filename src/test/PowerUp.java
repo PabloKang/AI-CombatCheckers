@@ -21,8 +21,5 @@ public abstract class PowerUp {
 	}
 
 	// Main execution function
-	public CheckersData execute(CheckersData board, Point user) 
-	{
-		return board;
-	}
+	public abstract CheckersData execute(CheckersData board, Point user, Point target);
 }
