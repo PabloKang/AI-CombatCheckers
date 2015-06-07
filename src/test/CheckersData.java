@@ -1,5 +1,6 @@
 package test;
 
+import java.awt.Point;
 import java.util.Vector;
 
 class CheckersData {
@@ -25,18 +26,28 @@ class CheckersData {
 	RED = 1,
 	RED_KING = 2,
 	BLACK = 3,
-	BLACK_KING = 4;
+	BLACK_KING = 4,
+	FREE_WEAPON = 10,
+	FREE_BUFF = 20,
+	FREE_HEX = 30;
+	
+	public static final int
+	HEIGHT = 8,
+	WIDTH = 8;
+	
+	public PowerUpSystem powerUpSys;
 
 	private int[][] board;  // board[r][c] is the contents of row r, column c.  
 
 
 	public CheckersData() {
 		// Constructor.  Create the board and set it up for a new game.
-		board = new int[8][8];
+		board = new int[HEIGHT][WIDTH];
 		RED_MEN = 12;
 		BLACK_MEN = 12;
 		RED_KINGS = 0;
 		BLACK_KINGS = 0;
+		powerUpSys = new PowerUpSystem();
 		setUpGame();
 	}
 
@@ -121,6 +132,48 @@ class CheckersData {
 		board[row][col] = piece;
 	}
 
+	
+	public void removePieceAt(Point p) {
+		removePieceAt(p.y, p.x);
+	}
+	public void removePieceAt(int row, int col) {
+		int jumped = board[row][col];
+		board[row][col] = EMPTY;
+		
+		switch(jumped) {
+		case 1:
+			RED_MEN--;
+			break;
+		case 2:
+			RED_KINGS--;
+			break;
+		case 3:
+			BLACK_MEN--;
+			break;
+		case 4:
+			BLACK_KINGS--;
+			break;
+		}
+	}
+	
+	
+	public int parsePiece(int code)
+	{
+		return code % 10;
+	}
+	
+	
+	public int parsePowerType(int code)
+	{
+		return code / 10;
+	}
+	
+	
+	public int parsePowerUp(int code)
+	{
+		return code / 100;
+	}
+	
 
 	public void makeMove(CheckersMove move) {
 		// Make the specified move.  It is assumed that move
@@ -135,40 +188,35 @@ class CheckersData {
 		// jumped piece is removed from the board.  If a piece moves
 		// the last row on the opponent's side of the board, the 
 		// piece becomes a king.
+		int target = board[toRow][toCol];	// Value of space a piece moved to
+		
 		board[toRow][toCol] = board[fromRow][fromCol];
 		board[fromRow][fromCol] = EMPTY;
+		
+		// CAPTURING PIECES WITH JUMPS
 		if (fromRow - toRow == 2 || fromRow - toRow == -2) {
-			// The move is a jump.  Remove the jumped piece from the board.
-			int jumpRow = (fromRow + toRow) / 2;  // Row of the jumped piece.
-			int jumpCol = (fromCol + toCol) / 2;  // Column of the jumped piece.
-			int jumped = board[jumpRow][jumpCol];
-			board[jumpRow][jumpCol] = EMPTY;
-			
-			switch(jumped) {
-			case 1:
-				RED_MEN--;
-				break;
-			case 2:
-				RED_KINGS--;
-				break;
-			case 3:
-				BLACK_MEN--;
-				break;
-			case 4:
-				BLACK_KINGS--;
-				break;
-			}
-			
+			removePieceAt((fromRow + toRow) / 2, (fromCol + toCol) / 2);			
 		}
+		
+		// KINGING REDS
 		if (toRow == 0 && board[toRow][toCol] == RED) {
 			board[toRow][toCol] = RED_KING;
 			RED_KINGS++;
 			RED_MEN--;
 		}
+		// KINGING BLACKS
 		if (toRow == 7 && board[toRow][toCol] == BLACK) {
 			board[toRow][toCol] = BLACK_KING;
 			BLACK_KINGS++;
 			BLACK_MEN--;
+		}
+		// TARGET LOCATION HAD POWER-UP
+		if (target != 0) {
+			int piece = parsePiece(board[toRow][toCol]);
+			int pType = parsePowerType(target);
+			
+			// Generate random PowerUp of pType
+			powerUpSys.listPowerUp(new Point(toCol,toRow), piece, powerUpSys.getRandomPowerUp(pType));
 		}
 	}
 
