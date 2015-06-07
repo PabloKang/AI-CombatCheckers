@@ -27,8 +27,8 @@ public class AI {
 
 	public static final double PLUS_INFINITY = Double.MAX_VALUE;
 	public static final double MINUS_INFINITY = -1 * Double.MAX_VALUE;
-	private static final int LEVEL_LIMIT = 3;
-	private static final double WEIGHT_VECTOR[] = {0.15, 0.35, 0.20, 0.30}; // { MoveDifferenceHeuristic, PieceDifferenceHeuristic, 
+	private static final int LEVEL_LIMIT = 5;
+	private static final double WEIGHT_VECTOR[] = {0.15, 0.4, 0.20, 0.25}; // { MoveDifferenceHeuristic, PieceDifferenceHeuristic, 
 																		//  Distance Heuristic, ProtectedPiecesHeuristic     }
 	private static final double WEIGHT_VECTOR_2[] = {0.15, 0.7, 0.05, 0.1};
 
