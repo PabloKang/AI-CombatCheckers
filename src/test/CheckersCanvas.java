@@ -15,12 +15,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import javafx.application.Application;
+import javafx.util.Pair;
 
 
 class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
@@ -33,17 +36,16 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 
 	CheckersData board;
 
-	private BufferedImage imgPieceBlack;
-	private BufferedImage imgPieceRed;
-	private BufferedImage imgKingBlack;
-	private BufferedImage imgKingRed;
-	
+	private HashMap<String, BufferedImage> images;
+
 	private int boardLength;
 	private double xOffset;
 	private double yOffset;
 	
 	public static AI firstAI;
 	public static AI secondAI;
+	public static AI firstCombatAI;
+	public static AI secondCombatAI;
 	public static int turnNumber = 0;
 	boolean gameInProgress;
 
@@ -75,11 +77,14 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		message = new JLabel("", JLabel.CENTER);
 		board = new CheckersData();
 
+		images = new HashMap<>();
 		try {
-			imgPieceBlack = ImageIO.read(new File(".\\images\\piece_black.png"));
-			imgPieceRed = ImageIO.read(new File(".\\images\\piece_red.png"));
-			imgKingBlack = ImageIO.read(new File(".\\images\\king_black.png"));
-			imgKingRed = ImageIO.read(new File(".\\images\\king_red.png"));
+			images.put("piece_black", ImageIO.read(new File(".\\images\\piece_black.png")));
+			images.put("piece_red", ImageIO.read(new File(".\\images\\piece_red.png")));
+			images.put("king_black", ImageIO.read(new File(".\\images\\king_black.png")));
+			images.put("king_red", ImageIO.read(new File(".\\images\\king_red.png")));
+			images.put("weapon_open", ImageIO.read(new File(".\\images\\weapon_open.png")));
+			images.put("weapon_taken", ImageIO.read(new File(".\\images\\weapon_taken.png")));
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -321,7 +326,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		
 		if (move.isJump()) {
 			
-			legalMoves = board.getLegalJumpsFrom(currentPlayer,move.toRow,move.toCol);
+			legalMoves = board.getLegalJumpsFrom(currentPlayer, move.toRow, move.toCol);
 			if (legalMoves != null) {
 				if (currentPlayer == CheckersData.RED)
 					message.setText("RED:  You must continue jumping.");
@@ -483,7 +488,6 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			if(firstAI.player == currentPlayer) 
@@ -613,6 +617,9 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				}
 
 				drawCheckersPiece(g2D, board.pieceAt(row, col), col, row);
+				if (CheckersData.parsePowerType(board.pieceAt(row, col)) > 0) {
+					drawPowerUp(g2D, board.pieceAt(row, col), col, row);
+				}
 			}
 		}
 
@@ -661,23 +668,72 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		AffineTransform at = new AffineTransform();
 		at.translate(x + xOffset, y + yOffset);
 
+		BufferedImage image;
+
 		switch (CheckersData.parsePiece(code)) {
 			case CheckersData.RED:
-				at.scale(squareLength / imgPieceRed.getWidth(), squareLength / imgPieceRed.getHeight());
-				g.drawImage(imgPieceRed, at, this);
+				image = images.get("piece_red");
+				at.scale(squareLength / image.getWidth(), squareLength / image.getHeight());
+				g.drawImage(image, at, this);
 				break;
 			case CheckersData.BLACK:
-				at.scale(squareLength / imgPieceBlack.getWidth(), squareLength / imgPieceBlack.getHeight());
-				g.drawImage(imgPieceBlack, at, this);
+				image = images.get("piece_black");
+				at.scale(squareLength / image.getWidth(), squareLength / image.getHeight());
+				g.drawImage(image, at, this);
 				break;
 			case CheckersData.RED_KING:
-				at.scale(squareLength / imgKingRed.getWidth(), squareLength / imgKingRed.getHeight());
-				g.drawImage(imgKingRed, at, this);
+				image = images.get("king_red");
+				at.scale(squareLength / image.getWidth(), squareLength / image.getHeight());
+				g.drawImage(image, at, this);
 				break;
 			case CheckersData.BLACK_KING:
-				at.scale(squareLength / imgKingBlack.getWidth(), squareLength / imgKingBlack.getHeight());
-				g.drawImage(imgKingBlack, at, this);
+				image = images.get("king_black");
+				at.scale(squareLength / image.getWidth(), squareLength / image.getHeight());
+				g.drawImage(image, at, this);
 				break;
+		}
+	}
+
+	private void drawPowerUp(Graphics2D g, int code, int col, int row) {
+		if (CheckersData.parsePowerType(code) > 0) {
+			double boardPadding = (double) boardLength * 0.01;
+			if (boardPadding < 2) {
+				boardPadding = 2;
+			}
+
+			double squareLength = ((double) boardLength - 2 * boardPadding) / 8;
+
+			double x = boardPadding + squareLength * col;
+			double y = boardPadding + squareLength * row;
+			AffineTransform at = new AffineTransform();
+			at.translate(x + xOffset, y + yOffset);
+
+			BufferedImage image;
+
+			String powerType = "none";
+			String powerStatus = "open";
+
+			switch (CheckersData.parsePowerType(code)) {
+				case 1:
+					powerType = "weapon";
+					break;
+				case 2:
+					powerType = "buff";
+					break;
+				case 3:
+					powerType = "hex";
+					break;
+			}
+
+			if (!powerType.equals("none")) {
+				if (CheckersData.parsePiece(code) > 0) {
+					powerStatus = "taken";
+				}
+
+				image = images.get(powerType + "_" + powerStatus);
+				at.scale(squareLength / image.getWidth(), squareLength / image.getHeight());
+				g.drawImage(image, at, this);
+			}
 		}
 	}
 

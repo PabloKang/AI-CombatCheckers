@@ -154,6 +154,7 @@ public class AI {
 		CheckersMove[] currentMoves = currentBoard.getLegalMoves(player);
 		if(currentMoves == null)
 			return null;
+		
 		int max_index = -1;		
 		double alpha = MINUS_INFINITY;
 		double beta = PLUS_INFINITY;
