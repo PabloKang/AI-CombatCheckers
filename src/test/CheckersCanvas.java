@@ -214,7 +214,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	}
 
 	void doResignAI() {
-		if (gameInProgress == false) {
+		if (!gameInProgress) {
 			message.setText("There is no game in progress!");
 			return;
 		}
@@ -232,6 +232,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			else
 				firstAI.wonGame();
 		}
+		gameInProgress = false;
 	}
 
 	void doResignAIvsAI() {
@@ -394,14 +395,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			doResignAI();
 			return;
 		}
-		if(turnNumber >= 50) {
-			if(drawDetection(move)) {
-				gameOver("Game is a draw.");
-				firstAI.drawGame();
-				gameInProgress = false;
-				return;
-			}
-		}
+
 		board.makeMove(move);
 		repaint();
 		
@@ -839,6 +833,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		System.out.println("done training");
 	}
 
+	
 	boolean drawDetection(CheckersMove move) {
 		ArrayList<CheckersMove> p1 = new ArrayList<CheckersMove>();
 		ArrayList<CheckersMove> p2 = new ArrayList<CheckersMove>();
