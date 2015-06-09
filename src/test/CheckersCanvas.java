@@ -75,10 +75,10 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		board = new CheckersData();
 
 		try {
-			imgPieceBlack = ImageIO.read(new File(System.getenv("APPDATA") + "\\Combat Checkers\\images\\piece_black.png"));
-			imgPieceRed = ImageIO.read(new File(System.getenv("APPDATA") + "\\Combat Checkers\\images\\piece_red.png"));
-			imgKingBlack = ImageIO.read(new File(System.getenv("APPDATA") + "\\Combat Checkers\\images\\king_black.png"));
-			imgKingRed = ImageIO.read(new File(System.getenv("APPDATA") + "\\Combat Checkers\\images\\king_red.png"));
+			imgPieceBlack = ImageIO.read(new File(".\\images\\piece_black.png"));
+			imgPieceRed = ImageIO.read(new File(".\\images\\piece_red.png"));
+			imgKingBlack = ImageIO.read(new File(".\\images\\king_black.png"));
+			imgKingRed = ImageIO.read(new File(".\\images\\king_red.png"));
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
@@ -157,7 +157,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			opponent = CheckersData.BLACK;
 		else
 			opponent = currentPlayer;
-		firstAI = new AI(aiPlayer, opponent, System.getenv("APPDATA") + "\\Combat Checkers\\text.txt", false, w1, w2);
+		firstAI = new AI(aiPlayer, opponent, ".\\data\\text.txt", false, w1, w2);
 		legalMoves = board.getLegalMoves(CheckersData.RED);  // Get RED's legal moves.
 		selectedRow = -1;   // RED has not yet selected a piece to move.
 		message.setText("Red:  Make your move.");
@@ -181,8 +181,8 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		board.setUpGame();
 		currentPlayer = CheckersData.RED;
 
-		firstAI = new AI(currentPlayer, CheckersData.BLACK, System.getenv("APPDATA") + "\\Combat Checkers\\text.txt", false, w1, w2);
-		secondAI = new AI(CheckersData.BLACK, currentPlayer, System.getenv("APPDATA") + "\\Combat Checkers\\text2.txt", false, w1, w2);
+		firstAI = new AI(currentPlayer, CheckersData.BLACK, ".\\data\\text.txt", false, w1, w2);
+		secondAI = new AI(CheckersData.BLACK, currentPlayer, ".\\data\\text2.txt", false, w1, w2);
 		legalMoves = board.getLegalMoves(CheckersData.RED);
 		selectedRow = -1;
 		message.setText("Red: Make your move.");
