@@ -68,6 +68,51 @@ class CheckersData {
 				case BLACK_KING:
 					h += "4";
 					break;
+				case 10:
+					h += "10";
+					break;
+				case 11:
+					h += "11";
+					break;
+				case 12:
+					h += "12";
+					break;
+				case 13:
+					h += "13";
+					break;
+				case 14:
+					h += "14";
+					break;
+				case 20:
+					h += "20";
+					break;
+				case 21:
+					h += "21";
+					break;
+				case 22:
+					h += "22";
+					break;
+				case 23:
+					h += "23";
+					break;
+				case 24:
+					h += "24";
+					break;
+				case 30:
+					h += "30";
+					break;
+				case 31:
+					h += "31";
+					break;
+				case 32:
+					h += "32";
+					break;
+				case 33:
+					h += "33";
+					break;
+				case 34:
+					h += "34";
+					break;
 				default:
 					h += "_";
 					break;
@@ -87,11 +132,11 @@ class CheckersData {
 			for (int col = 0; col < 8; col++) {
 				if ( row % 2 == col % 2 ) {
 					if (row < 3)
-					board[row][col] = BLACK;
+						board[row][col] = BLACK;
 					else if (row > 4)
-					board[row][col] = RED;
+						board[row][col] = RED;
 					else
-					board[row][col] = EMPTY;
+						board[row][col] = EMPTY;
 				}
 				else {
 					board[row][col] = EMPTY;
@@ -231,13 +276,13 @@ class CheckersData {
 		// if the player can jump, only jumps are legal moves.
 
 		if (player != RED && player != BLACK)
-		return null;
+			return null;
 
 		int playerKing;  // The constant representing a King belonging to player.
 		if (player == RED)
-		playerKing = RED_KING;
+			playerKing = RED_KING;
 		else
-		playerKing = BLACK_KING;
+			playerKing = BLACK_KING;
 
 		Vector<CheckersMove> moves = new Vector<CheckersMove>();  // Moves will be stored in this vector.
 		
@@ -251,13 +296,13 @@ class CheckersData {
 			for (int col = 0; col < 8; col++) {
 				if (board[row][col] == player || board[row][col] == playerKing) {
 					if (canJump(player, row, col, row+1, col+1, row+2, col+2))
-					moves.addElement(new CheckersMove(row, col, row+2, col+2));
+						moves.addElement(new CheckersMove(row, col, row+2, col+2));
 					if (canJump(player, row, col, row-1, col+1, row-2, col+2))
-					moves.addElement(new CheckersMove(row, col, row-2, col+2));
+						moves.addElement(new CheckersMove(row, col, row-2, col+2));
 					if (canJump(player, row, col, row+1, col-1, row+2, col-2))
-					moves.addElement(new CheckersMove(row, col, row+2, col-2));
+						moves.addElement(new CheckersMove(row, col, row+2, col-2));
 					if (canJump(player, row, col, row-1, col-1, row-2, col-2))
-					moves.addElement(new CheckersMove(row, col, row-2, col-2));
+						moves.addElement(new CheckersMove(row, col, row-2, col-2));
 				}
 			}
 		}
@@ -275,13 +320,13 @@ class CheckersData {
 				for (int col = 0; col < 8; col++) {
 					if (board[row][col] == player || board[row][col] == playerKing) {
 						if (canMove(player,row,col,row+1,col+1))
-						moves.addElement(new CheckersMove(row,col,row+1,col+1));
+							moves.addElement(new CheckersMove(row,col,row+1,col+1));
 						if (canMove(player,row,col,row-1,col+1))
-						moves.addElement(new CheckersMove(row,col,row-1,col+1));
+							moves.addElement(new CheckersMove(row,col,row-1,col+1));
 						if (canMove(player,row,col,row+1,col-1))
-						moves.addElement(new CheckersMove(row,col,row+1,col-1));
+							moves.addElement(new CheckersMove(row,col,row+1,col-1));
 						if (canMove(player,row,col,row-1,col-1))
-						moves.addElement(new CheckersMove(row,col,row-1,col-1));
+							moves.addElement(new CheckersMove(row,col,row-1,col-1));
 					}
 				}
 			}
@@ -292,11 +337,11 @@ class CheckersData {
 	legal moves from the vector into the array, and return the array. */
 		
 		if (moves.size() == 0)
-		return null;
+			return null;
 		else {
 			CheckersMove[] moveArray = new CheckersMove[moves.size()];
 			for (int i = 0; i < moves.size(); i++)
-			moveArray[i] = (CheckersMove)moves.elementAt(i);
+				moveArray[i] = (CheckersMove)moves.elementAt(i);
 			return moveArray;
 		}
 
@@ -309,29 +354,29 @@ class CheckersData {
 		// jumps are possible, null is returned.  The logic is similar
 		// to the logic of the getLegalMoves() method.
 		if (player != RED && player != BLACK)
-		return null;
+			return null;
 		int playerKing;  // The constant representing a King belonging to player.
 		if (player == RED)
-		playerKing = RED_KING;
+			playerKing = RED_KING;
 		else
-		playerKing = BLACK_KING;
+			playerKing = BLACK_KING;
 		Vector<CheckersMove> moves = new Vector<CheckersMove>();  // The legal jumps will be stored in this vector.
 		if (board[row][col] == player || board[row][col] == playerKing) {
 			if (canJump(player, row, col, row+1, col+1, row+2, col+2))
-			moves.addElement(new CheckersMove(row, col, row+2, col+2));
+				moves.addElement(new CheckersMove(row, col, row+2, col+2));
 			if (canJump(player, row, col, row-1, col+1, row-2, col+2))
-			moves.addElement(new CheckersMove(row, col, row-2, col+2));
+				moves.addElement(new CheckersMove(row, col, row-2, col+2));
 			if (canJump(player, row, col, row+1, col-1, row+2, col-2))
-			moves.addElement(new CheckersMove(row, col, row+2, col-2));
+				moves.addElement(new CheckersMove(row, col, row+2, col-2));
 			if (canJump(player, row, col, row-1, col-1, row-2, col-2))
-			moves.addElement(new CheckersMove(row, col, row-2, col-2));
+				moves.addElement(new CheckersMove(row, col, row-2, col-2));
 		}
 		if (moves.size() == 0)
-		return null;
+			return null;
 		else {
 			CheckersMove[] moveArray = new CheckersMove[moves.size()];
 			for (int i = 0; i < moves.size(); i++)
-			moveArray[i] = (CheckersMove)moves.elementAt(i);
+				moveArray[i] = (CheckersMove)moves.elementAt(i);
 			return moveArray;
 		}
 	}  // end getLegalJumpsFrom()
@@ -345,23 +390,23 @@ class CheckersData {
 		// (r2,c2) is the square between (r1,c1) and (r3,c3).
 		
 		if (r3 < 0 || r3 >= 8 || c3 < 0 || c3 >= 8)
-		return false;  // (r3,c3) is off the board.
+			return false;  // (r3,c3) is off the board.
 		
 		if (board[r3][c3] != EMPTY)
-		return false;  // (r3,c3) already contains a piece.
+			return false;  // (r3,c3) already contains a piece.
 		
 		if (player == RED) {
 			if (board[r1][c1] == RED && r3 > r1)
-			return false;  // Regular red piece can only move  up.
+				return false;  // Regular red piece can only move  up.
 			if (board[r2][c2] != BLACK && board[r2][c2] != BLACK_KING)
-			return false;  // There is no black piece to jump.
+				return false;  // There is no black piece to jump.
 			return true;  // The jump is legal.
 		}
 		else {
 			if (board[r1][c1] == BLACK && r3 < r1)
-			return false;  // Regular black piece can only move downn.
+				return false;  // Regular black piece can only move downn.
 			if (board[r2][c2] != RED && board[r2][c2] != RED_KING)
-			return false;  // There is no red piece to jump.
+				return false;  // There is no red piece to jump.
 			return true;  // The jump is legal.
 		}
 
@@ -375,19 +420,19 @@ class CheckersData {
 		// that (r2,c2) is a neighboring square.
 		
 		if (r2 < 0 || r2 >= 8 || c2 < 0 || c2 >= 8)
-		return false;  // (r2,c2) is off the board.
+			return false;  // (r2,c2) is off the board.
 		
 		if (board[r2][c2] != EMPTY)
-		return false;  // (r2,c2) already contains a piece.
+			return false;  // (r2,c2) already contains a piece.
 
 		if (player == RED) {
 			if (board[r1][c1] == RED && r2 > r1)
-			return false;  // Regualr red piece can only move down.
+				return false;  // Regualr red piece can only move down.
 			return true;  // The move is legal.
 		}
 		else {
 			if (board[r1][c1] == BLACK && r2 < r1)
-			return false;  // Regular black piece can only move up.
+				return false;  // Regular black piece can only move up.
 			return true;  // The move is legal.
 		}
 		
