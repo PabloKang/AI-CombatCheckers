@@ -639,7 +639,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		g.fill(new Rectangle2D.Double(x + xOffset, y + yOffset, length, length));
 	}
 
-	private void drawCheckersPiece(Graphics2D g, int piece, int col, int row) {
+	private void drawCheckersPiece(Graphics2D g, int code, int col, int row) {
 		double boardPadding = (double) boardLength * 0.01;
 		if (boardPadding < 2) boardPadding = 2;
 
@@ -650,7 +650,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		AffineTransform at = new AffineTransform();
 		at.translate(x + xOffset, y + yOffset);
 
-		switch (piece) {
+		switch (CheckersData.parsePiece(code)) {
 			case CheckersData.RED:
 				at.scale(squareLength / imgPieceRed.getWidth(), squareLength / imgPieceRed.getHeight());
 				g.drawImage(imgPieceRed, at, this);

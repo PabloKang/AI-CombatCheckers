@@ -120,6 +120,7 @@ class PowerUpSystem {
 				int col = rand.nextInt(CheckersData.WIDTH-1);
 				if(board.pieceAt(row, col) == CheckersData.EMPTY) {
 					board.setPieceAt(row, col, pSelector.randomType()*10);
+					System.out.println("Spawned PowerUp at [" + row + "]["+col+"]");
 					break;
 				}
 				tries--;
