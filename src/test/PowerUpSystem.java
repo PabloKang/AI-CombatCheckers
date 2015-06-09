@@ -114,15 +114,16 @@ class PowerUpSystem {
 	{
 		Random rand = new Random();
 		if (rand.nextInt(100) <= spawnThresh) {
-			int tries = 10;
+			int tries = 20;
 			do {
 				int row = rand.nextInt(CheckersData.HEIGHT-1);
 				int col = rand.nextInt(CheckersData.WIDTH-1);
-				if(board.pieceAt(row, col) == CheckersData.EMPTY) {
+				if(row % 2 == col % 2 && board.pieceAt(row, col) == CheckersData.EMPTY){
 					board.setPieceAt(row, col, pSelector.randomType()*10);
 					System.out.println("Spawned PowerUp at [" + row + "]["+col+"]");
 					break;
 				}
+
 				tries--;
 			} while( tries > 0);
 
