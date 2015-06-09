@@ -429,13 +429,11 @@ class CheckersData {
 		else
 			playerKing = BLACK_KING;
 		
-		int powerMan = 10 + player;
-		int powerKing = 10 + playerKing;
 		
 		if (r2 < 0 || r2 >= 8 || c2 < 0 || c2 >= 8)
 			return false;  // (r2,c2) is off the board.
 		
-		if (board[r2][c2] != EMPTY || board[r2][c2] != powerMan || board[r2][c2] != powerKing)
+		if (board[r2][c2] != EMPTY && board[r2][c2] != 10)
 			return false;  // (r2,c2) already contains a piece.
 
 		if (player == RED) {
