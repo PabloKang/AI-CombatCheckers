@@ -48,6 +48,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	boolean gameInProgress;
 
 	boolean vsAI = false;
+	boolean combatMode = false;
 
 	int currentPlayer;
 	int selectedRow, selectedCol;
@@ -87,6 +88,11 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	}
 	
 	public void setupGame() {
+		String[] modes = {"Combat", "Normal"};
+		String mode = (String) JOptionPane.showInputDialog(null, "Mode:", "Setup", JOptionPane.QUESTION_MESSAGE, null, modes, modes[0]);
+
+		combatMode = (mode.equals("Combat"));
+
 		String[] choices = {"AI vs AI", "AI vs Player", "Player vs AI", "Player vs Player"};
 		String choice = (String) JOptionPane.showInputDialog(null, "Game type:", "Setup", JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
 
@@ -303,7 +309,8 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		board.makeMove(move);
 		
 		// Check if PowerUp needs to spawn
-		board = board.powerUpSys.spawnPowerUp(board);
+		if (combatMode)
+			board = board.powerUpSys.spawnPowerUp(board);
 		
 		/* If the move was a jump, it's possible that the player has another
 		jump.  Check for legal jumps starting from the square that the player
@@ -380,7 +387,8 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		turnNumber++;
 		
 		// Check if PowerUp needs to spawn
-		board = board.powerUpSys.spawnPowerUp(board);
+		if (combatMode)
+			board = board.powerUpSys.spawnPowerUp(board);
 		
 		if(currentPlayer == firstAI.player && move == null) {
 			doResignAI();
@@ -509,7 +517,8 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		turnNumber++;
 		
 		// Check if PowerUp needs to spawn
-		board = board.powerUpSys.spawnPowerUp(board);
+		if (combatMode)
+			board = board.powerUpSys.spawnPowerUp(board);
 		
 		System.out.println("Game still happening");
 		if(move == null) {
