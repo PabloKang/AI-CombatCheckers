@@ -202,19 +202,19 @@ class CheckersData {
 	}
 	
 	
-	public int parsePiece(int code)
+	public static int parsePiece(int code)
 	{
 		return code % 10;
 	}
 	
 	
-	public int parsePowerType(int code)
+	public static int parsePowerType(int code)
 	{
 		return code / 10;
 	}
 	
 	
-	public int parsePowerUp(int code)
+	public static int parsePowerUp(int code)
 	{
 		return code / 100;
 	}
