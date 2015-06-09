@@ -49,9 +49,10 @@ public class AI {
 		isCombat = combat;
 		player = p;
 		opponent = opposition;
-		WEIGHT_VECTOR = new double[4];
-		WEIGHT_VECTOR_2 = new double[4];
-		for(int i = 0; i < 4; i++) {
+		int len = w1.length;
+		WEIGHT_VECTOR = new double[len];
+		WEIGHT_VECTOR_2 = new double[len];
+		for(int i = 0; i < len; i++) {
 			WEIGHT_VECTOR[i] = w1[i];
 			WEIGHT_VECTOR[i] = w2[i];
 		}
