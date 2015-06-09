@@ -296,13 +296,13 @@ class CheckersData {
 			for (int col = 0; col < 8; col++) {
 				if (board[row][col] == player || board[row][col] == playerKing) {
 					if (canJump(player, row, col, row+1, col+1, row+2, col+2))
-						moves.addElement(new CheckersMove(row, col, row+2, col+2));
+						moves.addElement(new CheckersMove(row, col, row+2, col+2, false));
 					if (canJump(player, row, col, row-1, col+1, row-2, col+2))
-						moves.addElement(new CheckersMove(row, col, row-2, col+2));
+						moves.addElement(new CheckersMove(row, col, row-2, col+2, false));
 					if (canJump(player, row, col, row+1, col-1, row+2, col-2))
-						moves.addElement(new CheckersMove(row, col, row+2, col-2));
+						moves.addElement(new CheckersMove(row, col, row+2, col-2, false));
 					if (canJump(player, row, col, row-1, col-1, row-2, col-2))
-						moves.addElement(new CheckersMove(row, col, row-2, col-2));
+						moves.addElement(new CheckersMove(row, col, row-2, col-2, false));
 				}
 			}
 		}
@@ -314,19 +314,24 @@ class CheckersData {
 		move in each of the four directions from that square.  If there is 
 		a legal move in that direction, put it in the moves vector.
 	*/
+		int powerMan = 10 + player;
+		int powerKing = 10 + playerKing;
 		
 		if (moves.size() == 0) {
 			for (int row = 0; row < 8; row++) {
 				for (int col = 0; col < 8; col++) {
 					if (board[row][col] == player || board[row][col] == playerKing) {
 						if (canMove(player,row,col,row+1,col+1))
-							moves.addElement(new CheckersMove(row,col,row+1,col+1));
+							moves.addElement(new CheckersMove(row,col,row+1,col+1, false));
 						if (canMove(player,row,col,row-1,col+1))
-							moves.addElement(new CheckersMove(row,col,row-1,col+1));
+							moves.addElement(new CheckersMove(row,col,row-1,col+1, false));
 						if (canMove(player,row,col,row+1,col-1))
-							moves.addElement(new CheckersMove(row,col,row+1,col-1));
+							moves.addElement(new CheckersMove(row,col,row+1,col-1, false));
 						if (canMove(player,row,col,row-1,col-1))
-							moves.addElement(new CheckersMove(row,col,row-1,col-1));
+							moves.addElement(new CheckersMove(row,col,row-1,col-1, false));
+					}
+					else if(board[row][col] == powerMan || board[row][col] == powerKing) {
+						moves.addElement(new CheckersMove(row, col, row, col, true));
 					}
 				}
 			}
@@ -363,13 +368,13 @@ class CheckersData {
 		Vector<CheckersMove> moves = new Vector<CheckersMove>();  // The legal jumps will be stored in this vector.
 		if (board[row][col] == player || board[row][col] == playerKing) {
 			if (canJump(player, row, col, row+1, col+1, row+2, col+2))
-				moves.addElement(new CheckersMove(row, col, row+2, col+2));
+				moves.addElement(new CheckersMove(row, col, row+2, col+2, false));
 			if (canJump(player, row, col, row-1, col+1, row-2, col+2))
-				moves.addElement(new CheckersMove(row, col, row-2, col+2));
+				moves.addElement(new CheckersMove(row, col, row-2, col+2, false));
 			if (canJump(player, row, col, row+1, col-1, row+2, col-2))
-				moves.addElement(new CheckersMove(row, col, row+2, col-2));
+				moves.addElement(new CheckersMove(row, col, row+2, col-2, false));
 			if (canJump(player, row, col, row-1, col-1, row-2, col-2))
-				moves.addElement(new CheckersMove(row, col, row-2, col-2));
+				moves.addElement(new CheckersMove(row, col, row-2, col-2, false));
 		}
 		if (moves.size() == 0)
 			return null;
@@ -418,11 +423,19 @@ class CheckersData {
 		// the player can legally move from (r1,c1) to (r2,c2).  It is
 		// assumed that (r1,r2) contains one of the player's pieces and
 		// that (r2,c2) is a neighboring square.
+		int playerKing;
+		if (player == RED)
+			playerKing = RED_KING;
+		else
+			playerKing = BLACK_KING;
+		
+		int powerMan = 10 + player;
+		int powerKing = 10 + playerKing;
 		
 		if (r2 < 0 || r2 >= 8 || c2 < 0 || c2 >= 8)
 			return false;  // (r2,c2) is off the board.
 		
-		if (board[r2][c2] != EMPTY)
+		if (board[r2][c2] != EMPTY || board[r2][c2] != powerMan || board[r2][c2] != powerKing)
 			return false;  // (r2,c2) already contains a piece.
 
 		if (player == RED) {

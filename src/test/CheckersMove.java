@@ -7,12 +7,17 @@ class CheckersMove {
 	// (This class makes no guarantee that the move is legal.)
 	int fromRow, fromCol;  // Position of piece to be moved.
 	int toRow, toCol;      // Square it is to move to.
-	CheckersMove(int r1, int c1, int r2, int c2) {
+	boolean isPowerMove;
+	CheckersMove(int r1, int c1, int r2, int c2, boolean power) {
 		// Constructor.  Just set the values of the instance variables.
 		fromRow = r1;
 		fromCol = c1;
 		toRow = r2;
 		toCol = c2;
+		isPowerMove = power;
+	}
+	boolean isPower() {
+		return isPowerMove;
 	}
 	boolean isJump() {
 		// Test whether this move is a jump.  It is assumed that

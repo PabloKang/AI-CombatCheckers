@@ -44,6 +44,8 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	
 	public static AI firstAI;
 	public static AI secondAI;
+	public static AI firstCombatAI;
+	public static AI secondCombatAI;
 	public static int turnNumber = 0;
 	boolean gameInProgress;
 
