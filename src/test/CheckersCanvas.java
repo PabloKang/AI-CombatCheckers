@@ -54,6 +54,11 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	CheckersMove[] legalMoves;
 	int winner;
 	
+	double[] w1 = {0.15, 0.4, 0.20, 0.25}; // weight vectors // { MoveDifferenceHeuristic, PieceDifferenceHeuristic,
+	double[] w2 = {0.15, 0.7, 0.05, 0.1};					 //  Distance Heuristic, ProtectedPiecesHeuristic     }
+	double[] w3 = {0.25, 0.4, 0.15, 0.2};
+	double[] w4 = {0.2, 0.5, 0.1, 0.2};
+	
 	public CheckersCanvas() {
 		setBackground(Color.black);
 		addMouseListener(this);
@@ -152,7 +157,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			opponent = CheckersData.BLACK;
 		else
 			opponent = currentPlayer;
-		firstAI = new AI(aiPlayer, opponent, System.getenv("APPDATA") + "\\Combat Checkers\\text.txt");
+		firstAI = new AI(aiPlayer, opponent, System.getenv("APPDATA") + "\\Combat Checkers\\text.txt", false, w1, w2);
 		legalMoves = board.getLegalMoves(CheckersData.RED);  // Get RED's legal moves.
 		selectedRow = -1;   // RED has not yet selected a piece to move.
 		message.setText("Red:  Make your move.");
@@ -175,8 +180,9 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		turnNumber = 0;
 		board.setUpGame();
 		currentPlayer = CheckersData.RED;
-		firstAI = new AI(currentPlayer, CheckersData.BLACK, System.getenv("APPDATA") + "\\Combat Checkers\\text.txt");
-		secondAI = new AI(CheckersData.BLACK, currentPlayer, System.getenv("APPDATA") + "\\Combat Checkers\\text2.txt");
+
+		firstAI = new AI(currentPlayer, CheckersData.BLACK, System.getenv("APPDATA") + "\\Combat Checkers\\text.txt", false, w1, w2);
+		secondAI = new AI(CheckersData.BLACK, currentPlayer, System.getenv("APPDATA") + "\\Combat Checkers\\text2.txt", false, w1, w2);
 		legalMoves = board.getLegalMoves(CheckersData.RED);
 		selectedRow = -1;
 		message.setText("Red: Make your move.");
@@ -293,7 +299,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		// This is called when the current player has chosen the specified
 		// move.  Make the move, and then either end or continue the game
 		// appropriately.
-		
+		turnNumber++;
 		board.makeMove(move);
 		
 		// Check if PowerUp needs to spawn
@@ -467,6 +473,13 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	void startAIvsAIGame() {
 
 		while(gameInProgress) {
+			repaint();
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			if(firstAI.player == currentPlayer) 
 				doMakeMoveAI(firstAI.makeMove(board));
 			else

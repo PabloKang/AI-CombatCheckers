@@ -28,13 +28,15 @@ public class AI {
 	public static final double PLUS_INFINITY = Double.MAX_VALUE;
 	public static final double MINUS_INFINITY = -1 * Double.MAX_VALUE;
 	private static final int LEVEL_LIMIT = 5;
-	private static final double WEIGHT_VECTOR[] = {0.15, 0.4, 0.20, 0.25}; // { MoveDifferenceHeuristic, PieceDifferenceHeuristic, 
+	private double WEIGHT_VECTOR[]; // {0.15, 0.4, 0.20, 0.25}; // { MoveDifferenceHeuristic, PieceDifferenceHeuristic, 
 																		//  Distance Heuristic, ProtectedPiecesHeuristic     }
-	private static final double WEIGHT_VECTOR_2[] = {0.15, 0.7, 0.05, 0.1};
+	private double WEIGHT_VECTOR_2[]; // {0.15, 0.7, 0.05, 0.1};
 
 	private static final int late_game = 50;
 	
 	private boolean isRandom;
+	
+	private boolean isCombat;
 	
 	private static final int
 	GOOD_MOVE = 1,
@@ -42,10 +44,18 @@ public class AI {
 	DRAW_MOVE = 0;
 
 	// Constructor for AI
-	AI(int p, int opposition, String file) {
+	AI(int p, int opposition, String file, boolean combat, double[] w1, double[] w2) {
 		isRandom = false;
+		isCombat = combat;
 		player = p;
 		opponent = opposition;
+		int len = w1.length;
+		WEIGHT_VECTOR = new double[len];
+		WEIGHT_VECTOR_2 = new double[len];
+		for(int i = 0; i < len; i++) {
+			WEIGHT_VECTOR[i] = w1[i];
+			WEIGHT_VECTOR[i] = w2[i];
+		}
 		if(player == CheckersData.RED) {
 			playerKing = CheckersData.RED_KING;
 			opponentKing = CheckersData.BLACK_KING;
