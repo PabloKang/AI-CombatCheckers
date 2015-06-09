@@ -210,7 +210,7 @@ class CheckersData {
 	
 	public static int parsePowerType(int code)
 	{
-		return code / 10;
+		return (code / 10) % 10;
 	}
 	
 	
