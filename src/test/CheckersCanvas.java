@@ -378,6 +378,10 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 
 	void doMakeMoveAI(CheckersMove move) {
 		turnNumber++;
+		
+		// Check if PowerUp needs to spawn
+		board = board.powerUpSys.spawnPowerUp(board);
+		
 		if(currentPlayer == firstAI.player && move == null) {
 			doResignAI();
 			return;
@@ -503,6 +507,10 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	
 	void doMakeMoveAIvsAI(CheckersMove move) {
 		turnNumber++;
+		
+		// Check if PowerUp needs to spawn
+		board = board.powerUpSys.spawnPowerUp(board);
+		
 		System.out.println("Game still happening");
 		if(move == null) {
 			doResignAIvsAI();
