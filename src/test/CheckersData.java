@@ -249,20 +249,23 @@ class CheckersData {
 		// jumped piece is removed from the board.  If a piece moves
 		// the last row on the opponent's side of the board, the 
 		// piece becomes a king.
-
 		
-		if(power) {
-			int piece = board[toRow][toCol] % 10;
-			
-			
-			
-		}
-		else {
+		
+//		if(power) {
+//			int piece = board[toRow][toCol] % 10;
+//			
+//			
+//			
+//		}
+//		else {
 			int target = board[toRow][toCol];	// Value of space a piece moved to
+			int powerPiece = board[fromRow][fromCol]/10;
 			
-			
-			board[toRow][toCol] = (board[fromRow][fromCol] % 10) + target;
-			board[fromRow][fromCol] = EMPTY;
+			if(target == 0)
+				board[toRow][toCol] = board[fromRow][fromCol];
+			else
+				board[toRow][toCol] = board[fromRow][fromCol] % 10 + target;
+				board[fromRow][fromCol] = EMPTY;
 			
 			// CAPTURING PIECES WITH JUMPS
 			if (fromRow - toRow == 2 || fromRow - toRow == -2) {
@@ -270,14 +273,20 @@ class CheckersData {
 			}
 			
 			// KINGING REDS
-			if (toRow == 0 && board[toRow][toCol] == RED) {
-				board[toRow][toCol] = RED_KING + target;
+			if (toRow == 0 && board[toRow][toCol]%10 == RED) {
+				if(target == 0)
+					board[toRow][toCol] = RED_KING + (10*powerPiece);
+				else
+					board[toRow][toCol] = RED_KING + target;
 				RED_KINGS++;
 				RED_MEN--;
 			}
 			// KINGING BLACKS
-			if (toRow == 7 && board[toRow][toCol] == BLACK) {
-				board[toRow][toCol] = BLACK_KING + target;
+			if (toRow == 7 && board[toRow][toCol]%10 == BLACK) {
+				if(target == 0)
+					board[toRow][toCol] = BLACK_KING + (10*powerPiece);
+				else
+					board[toRow][toCol] = BLACK_KING + target;
 				BLACK_KINGS++;
 				BLACK_MEN--;
 			}
@@ -289,7 +298,7 @@ class CheckersData {
 				// Generate random PowerUp of pType
 				powerUpSys.listPowerUp(new Point(toCol,toRow), piece, powerUpSys.getRandomPowerUp(pType));
 			}
-		}
+//		}
 	}
 
 
@@ -321,7 +330,7 @@ class CheckersData {
 
 		for (int row = 0; row < 8; row++) {
 			for (int col = 0; col < 8; col++) {
-				if (board[row][col] == player || board[row][col] == playerKing) {
+				if (board[row][col]%10 == player || board[row][col]%10 == playerKing) {
 					if (canJump(player, row, col, row+1, col+1, row+2, col+2))
 						moves.addElement(new CheckersMove(row, col, row+2, col+2, false));
 					if (canJump(player, row, col, row-1, col+1, row-2, col+2))
@@ -347,7 +356,7 @@ class CheckersData {
 		if (moves.size() == 0) {
 			for (int row = 0; row < 8; row++) {
 				for (int col = 0; col < 8; col++) {
-					if (board[row][col] == player || board[row][col] == playerKing) {
+					if (board[row][col]%10 == player || board[row][col]%10 == playerKing) {
 						if (canMove(player,row,col,row+1,col+1))
 							moves.addElement(new CheckersMove(row,col,row+1,col+1, false));
 						if (canMove(player,row,col,row-1,col+1))
@@ -393,7 +402,7 @@ class CheckersData {
 		else
 			playerKing = BLACK_KING;
 		Vector<CheckersMove> moves = new Vector<CheckersMove>();  // The legal jumps will be stored in this vector.
-		if (board[row][col] == player || board[row][col] == playerKing) {
+		if (board[row][col]%10 == player || board[row][col]%10 == playerKing) {
 			if (canJump(player, row, col, row+1, col+1, row+2, col+2))
 				moves.addElement(new CheckersMove(row, col, row+2, col+2, false));
 			if (canJump(player, row, col, row-1, col+1, row-2, col+2))
@@ -424,20 +433,20 @@ class CheckersData {
 		if (r3 < 0 || r3 >= 8 || c3 < 0 || c3 >= 8)
 			return false;  // (r3,c3) is off the board.
 		
-		if (board[r3][c3] != EMPTY)
+		if (board[r3][c3]%10 != EMPTY)
 			return false;  // (r3,c3) already contains a piece.
 		
 		if (player == RED) {
-			if (board[r1][c1] == RED && r3 > r1)
+			if (board[r1][c1]%10 == RED && r3 > r1)
 				return false;  // Regular red piece can only move  up.
-			if (board[r2][c2] != BLACK && board[r2][c2] != BLACK_KING)
+			if (board[r2][c2]%10 != BLACK && board[r2][c2]%10 != BLACK_KING)
 				return false;  // There is no black piece to jump.
 			return true;  // The jump is legal.
 		}
 		else {
-			if (board[r1][c1] == BLACK && r3 < r1)
+			if (board[r1][c1]%10 == BLACK && r3 < r1)
 				return false;  // Regular black piece can only move downn.
-			if (board[r2][c2] != RED && board[r2][c2] != RED_KING)
+			if (board[r2][c2]%10 != RED && board[r2][c2]%10 != RED_KING)
 				return false;  // There is no red piece to jump.
 			return true;  // The jump is legal.
 		}
@@ -460,16 +469,16 @@ class CheckersData {
 		if (r2 < 0 || r2 >= 8 || c2 < 0 || c2 >= 8)
 			return false;  // (r2,c2) is off the board.
 		
-		if (board[r2][c2] != EMPTY && board[r2][c2] != 10)
+		if (board[r2][c2]%10 != EMPTY)
 			return false;  // (r2,c2) already contains a piece.
 
 		if (player == RED) {
-			if (board[r1][c1] == RED && r2 > r1)
+			if (board[r1][c1]%10 == RED && r2 > r1)
 				return false;  // Regualr red piece can only move down.
 			return true;  // The move is legal.
 		}
 		else {
-			if (board[r1][c1] == BLACK && r2 < r1)
+			if (board[r1][c1]%10 == BLACK && r2 < r1)
 				return false;  // Regular black piece can only move up.
 			return true;  // The move is legal.
 		}
