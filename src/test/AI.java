@@ -38,6 +38,8 @@ public class AI {
 	
 	private boolean isCombat;
 	
+	private PowerUp pow;
+	
 	private static final int
 	GOOD_MOVE = 1,
 	BAD_MOVE = -1,
