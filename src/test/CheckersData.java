@@ -249,15 +249,15 @@ class CheckersData {
 		// jumped piece is removed from the board.  If a piece moves
 		// the last row on the opponent's side of the board, the 
 		// piece becomes a king.
-
 		
-		if(power) {
-			int piece = board[toRow][toCol] % 10;
-			
-			
-			
-		}
-		else {
+		
+//		if(power) {
+//			int piece = board[toRow][toCol] % 10;
+//			
+//			
+//			
+//		}
+//		else {
 			int target = board[toRow][toCol];	// Value of space a piece moved to
 			
 			
@@ -289,7 +289,7 @@ class CheckersData {
 				// Generate random PowerUp of pType
 				powerUpSys.listPowerUp(new Point(toCol,toRow), piece, powerUpSys.getRandomPowerUp(pType));
 			}
-		}
+//		}
 	}
 
 
