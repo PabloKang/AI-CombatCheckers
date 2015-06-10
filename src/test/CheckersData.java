@@ -235,7 +235,7 @@ class CheckersData {
 		// piece becomes a king.
 		int target = board[toRow][toCol];	// Value of space a piece moved to
 		
-		board[toRow][toCol] = board[fromRow][fromCol];
+		board[toRow][toCol] = (board[fromRow][fromCol] % 10) + board[toRow][toCol];
 		board[fromRow][fromCol] = EMPTY;
 		
 		// CAPTURING PIECES WITH JUMPS
