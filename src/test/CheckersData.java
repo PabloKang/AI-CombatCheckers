@@ -147,9 +147,25 @@ class CheckersData {
 
 
 	public void setUpGame(int[][] b) {
+		BLACK_MEN = 0;
+		RED_MEN = 0;
 		for(int row = 0; row < 8; row++) {
 			for(int col = 0; col < 8; col++) {
 				board[row][col] = b[row][col];
+				switch(board[row][col] % 10) {
+				case BLACK:
+					BLACK_MEN++;
+					break;
+				case RED:
+					RED_MEN++;
+					break;
+				case RED_KING:
+					RED_KINGS++;
+					break;
+				case BLACK_KING:
+					BLACK_KINGS++;
+					break;
+				}
 			}
 		}
 	} // end setUpGame(int[][] b)
@@ -223,45 +239,55 @@ class CheckersData {
 	public void makeMove(CheckersMove move) {
 		// Make the specified move.  It is assumed that move
 		// is non-null and that the move it represents is legal.
-		makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
+		makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol, move.isPowerMove);
 	}
 
 
-	public void makeMove(int fromRow, int fromCol, int toRow, int toCol) {
+	public void makeMove(int fromRow, int fromCol, int toRow, int toCol, boolean power) {
 		// Make the move from (fromRow,fromCol) to (toRow,toCol).  It is
 		// assumed that this move is legal.  If the move is a jump, the
 		// jumped piece is removed from the board.  If a piece moves
 		// the last row on the opponent's side of the board, the 
 		// piece becomes a king.
-		int target = board[toRow][toCol];	// Value of space a piece moved to
 		
-		board[toRow][toCol] = board[fromRow][fromCol];
-		board[fromRow][fromCol] = EMPTY;
-		
-		// CAPTURING PIECES WITH JUMPS
-		if (fromRow - toRow == 2 || fromRow - toRow == -2) {
-			removePieceAt((fromRow + toRow) / 2, (fromCol + toCol) / 2);			
-		}
-		
-		// KINGING REDS
-		if (toRow == 0 && board[toRow][toCol] == RED) {
-			board[toRow][toCol] = RED_KING;
-			RED_KINGS++;
-			RED_MEN--;
-		}
-		// KINGING BLACKS
-		if (toRow == 7 && board[toRow][toCol] == BLACK) {
-			board[toRow][toCol] = BLACK_KING;
-			BLACK_KINGS++;
-			BLACK_MEN--;
-		}
-		// TARGET LOCATION HAD POWER-UP
-		if (target != 0) {
-			int piece = parsePiece(board[toRow][toCol]);
-			int pType = parsePowerType(target);
+		if(power) {
+			int piece = board[toRow][toCol] % 10;
 			
-			// Generate random PowerUp of pType
-			powerUpSys.listPowerUp(new Point(toCol,toRow), piece, powerUpSys.getRandomPowerUp(pType));
+			
+			
+		}
+		else {
+			int target = board[toRow][toCol];	// Value of space a piece moved to
+			
+			
+			board[toRow][toCol] = (board[fromRow][fromCol] % 10) + target;
+			board[fromRow][fromCol] = EMPTY;
+			
+			// CAPTURING PIECES WITH JUMPS
+			if (fromRow - toRow == 2 || fromRow - toRow == -2) {
+				removePieceAt((fromRow + toRow) / 2, (fromCol + toCol) / 2);			
+			}
+			
+			// KINGING REDS
+			if (toRow == 0 && board[toRow][toCol] == RED) {
+				board[toRow][toCol] = RED_KING + target;
+				RED_KINGS++;
+				RED_MEN--;
+			}
+			// KINGING BLACKS
+			if (toRow == 7 && board[toRow][toCol] == BLACK) {
+				board[toRow][toCol] = BLACK_KING + target;
+				BLACK_KINGS++;
+				BLACK_MEN--;
+			}
+			// TARGET LOCATION HAD POWER-UP
+			if (target != 0) {
+				int piece = parsePiece(board[toRow][toCol]);
+				int pType = parsePowerType(target);
+				
+				// Generate random PowerUp of pType
+				powerUpSys.listPowerUp(new Point(toCol,toRow), piece, powerUpSys.getRandomPowerUp(pType));
+			}
 		}
 	}
 
