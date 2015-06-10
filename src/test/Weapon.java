@@ -39,7 +39,6 @@ class Laser extends Weapon
 		p.x += target.x;
 		p.y += target.y;
 		
-		// Find the first piece along the target path and kill it
 		while(p.x < board.WIDTH && p.x >= 0 && p.y < board.HEIGHT && p.y >= 0) {
 			pCode = board.pieceAt(p.y, p.x);
 			
@@ -68,29 +67,9 @@ class Bomb extends Weapon
 		type = "bomb";
 	}
 
-	// Execute Bomb
+	// Execute Laser
 	public CheckersData execute(CheckersData board, Point user, Point target)
 	{
-		Point p = user;
-		int pCode;
-		
-		// Kill yourself
-		board.removePieceAt(p);
-		
-		// Kill neighbors
-		if(p.x > 0 && p.y > 0) { 						// Top left
-			board.removePieceAt(p.x-1,p.y-1);
-		}
-		if(p.x < board.WIDTH && p.y > 0) { 				// Top right
-			board.removePieceAt(p.x+1,p.y-1);
-		}
-		if(p.x > 0 && p.y < board.HEIGHT) { 			// Bottom left
-			board.removePieceAt(p.x-1,p.y+1);
-		}
-		if(p.x < board.WIDTH && p.y < board.HEIGHT) { 	// Bottom right
-			board.removePieceAt(p.x+1,p.y+1);
-		}
-		
 		return board;
 	}
 }
@@ -107,12 +86,9 @@ class AirStrike extends Weapon
 		type = "air strike";
 	}
 
-	// Execute Air Strike
+	// Execute Laser
 	public CheckersData execute(CheckersData board, Point user, Point target)
 	{
-		// Kill the target
-		board.removePieceAt(target);
-		
 		return board;
 	}
 }
