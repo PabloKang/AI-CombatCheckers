@@ -28,11 +28,14 @@ import javafx.util.Pair;
 
 class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 
-
+	JButton powerUpButton;
 	JButton resignButton;
 	JButton newGameButton;
 
 	JLabel message;
+	JLabel powerUpLabel;
+
+	JPanel powerUpPanel;
 
 	CheckersData board;
 
@@ -74,6 +77,11 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		newGameButton = new JButton("New Game");
 		newGameButton.addActionListener(this);
 
+		powerUpPanel = new JPanel();
+		powerUpLabel = new JLabel("No power-up selected", JLabel.CENTER);
+		powerUpButton = new JButton("Use");
+		powerUpButton.setEnabled(false);
+
 		message = new JLabel("", JLabel.CENTER);
 		board = new CheckersData();
 
@@ -96,7 +104,12 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		String[] modes = {"Combat", "Normal"};
 		String mode = (String) JOptionPane.showInputDialog(null, "Mode:", "Setup", JOptionPane.QUESTION_MESSAGE, null, modes, modes[0]);
 
-		combatMode = (mode.equals("Combat"));
+		if (mode != null) {
+			combatMode = mode.equals("Combat");
+			powerUpPanel.setVisible(combatMode);
+		} else {
+			System.exit(0);
+		}
 
 		String[] choices = {"AI vs AI", "AI vs Player", "Player vs AI", "Player vs Player"};
 		String choice = (String) JOptionPane.showInputDialog(null, "Game type:", "Setup", JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
@@ -630,6 +643,11 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 
 			if (selectedRow >= 0) {
 				drawHighlight(g2D, Color.white, selectedCol, selectedRow);
+				if (CheckersData.parsePowerType(board.pieceAt(selectedRow, selectedCol)) > 0) {
+					displayPowerUpInfo(board.pieceAt(selectedRow, selectedCol));
+				} else {
+					hidePowerUpInfo();
+				}
 				for (int i = 0; i < legalMoves.length; i++) {
 					if (legalMoves[i].fromCol == selectedCol && legalMoves[i].fromRow == selectedRow)
 						drawHighlight(g2D, new Color(0, 238, 0), legalMoves[i].toCol, legalMoves[i].toRow);
@@ -751,6 +769,43 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		g.setColor(c);
 		g.setStroke(new BasicStroke((float) weight));
 		g.draw(new Rectangle2D.Double(x + xOffset, y + yOffset, length - 1, length - 1));
+	}
+
+	private void displayPowerUpInfo(int code) {
+		String powerType = "none";
+
+		switch (CheckersData.parsePowerType(code)) {
+			case 1:
+				powerType = "weapon";
+				break;
+			case 2:
+				powerType = "buff";
+				break;
+			case 3:
+				powerType = "hex";
+				break;
+		}
+
+		powerUpLabel.setText("");
+		powerUpLabel.setIcon(new ImageIcon(resizeImage(images.get(powerType + "_open"), 128, 128)));
+		powerUpButton.setEnabled(true);
+	}
+
+	private void hidePowerUpInfo() {
+		powerUpLabel.setIcon(null);
+		powerUpLabel.setText("No power-up selected");
+		powerUpButton.setEnabled(false);
+	}
+
+	private BufferedImage resizeImage (BufferedImage i, int w, int h) {
+		BufferedImage icon = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g2D = icon.createGraphics();
+		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+		g2D.drawImage(i, 0, 0, w, h, null);
+		return icon;
 	}
 
 	public Dimension getPreferredSize() {
