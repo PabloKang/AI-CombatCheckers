@@ -39,6 +39,7 @@ class PowerUpSystem {
 	// PowerUpSelector
 	private PowerUpSelector pSelector;
 	 
+	public static boolean powerSpawned;
 
 // MEMBER FUNCTIONS
 	// Constructor
@@ -124,6 +125,7 @@ class PowerUpSystem {
 	// Roll. If true, spawn a power-up on a random empty tile on the board.
 	public int[][] spawnPowerUp(int[][] board)
 	{
+		powerSpawned = false;
 		Random rand = new Random();
 		if (rand.nextInt(100) <= spawnThresh) {
 			int tries = 20;
@@ -133,6 +135,7 @@ class PowerUpSystem {
 				if(row % 2 == col % 2 && board[row][col] == CheckersData.EMPTY){
 					board[row][col] = pSelector.randomType()*10;
 					System.out.println("Spawned PowerUp at [" + row + "]["+col+"]");
+					powerSpawned = true;
 					break;
 				}
 
