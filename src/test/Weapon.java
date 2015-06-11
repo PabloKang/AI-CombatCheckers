@@ -63,12 +63,11 @@ class Laser extends Weapon
 				pCode = board[p.x][p.y];
 				
 				if (pCode % 10 != 0) {
-					laserMoveList.add(new CheckersMove(user.x,user.y,p.x,p.y,true));
+					laserMoveList.add(new CheckersMove(user.y,user.x,p.y,p.x,true));
 					break;
 				}
 				else{
-					p.x += path.x;
-					p.y += path.y;
+					p.move(p.x + path.x, p.y + path.y);
 				}
 			}
 		}
@@ -97,7 +96,7 @@ class Bomb extends Weapon
 	public CheckersMove[] moves(int[][] board, Point user) 
 	{
 		CheckersMove[] bombMoves = new CheckersMove[1];
-		bombMoves[0] = new CheckersMove(user.x,user.y,user.x,user.y,true);
+		bombMoves[0] = new CheckersMove(user.y,user.x,user.y,user.x,true);
 		
 		return bombMoves;
 	}
@@ -154,9 +153,9 @@ class AirStrike extends Weapon
 				
 				if (row % 2 == col % 2 && tCode != CheckersData.EMPTY) {
 					if((pCode == CheckersData.BLACK || pCode == CheckersData.BLACK_KING) && (tCode == CheckersData.RED || tCode == CheckersData.RED_KING))
-						aStrikeMoveList.add(new CheckersMove(user.x, user.y, row, col, true));
+						aStrikeMoveList.add(new CheckersMove(user.y, user.x, row, col, true));
 					if((pCode == CheckersData.RED || pCode == CheckersData.RED_KING) && (tCode == CheckersData.BLACK || tCode == CheckersData.BLACK_KING))
-						aStrikeMoveList.add(new CheckersMove(user.x, user.y, row, col, true));
+						aStrikeMoveList.add(new CheckersMove(user.y, user.x, row, col, true));
 				}
 			}
 		}

@@ -56,6 +56,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	int selectedRow, selectedCol;
 	int powerUpRow, powerUpCol;
 	PowerUp selectedPowerUp;
+	String prevMessage;
 	CheckersMove[] legalMoves;
 	int winner;
 	
@@ -290,31 +291,16 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	
 	
 	void doClickSquare(int row, int col) {
-
-		for (int i = 0; i < legalMoves.length; i++)
-		if (legalMoves[i].fromRow == row && legalMoves[i].fromCol == col) {
-			selectedRow = row;
-			selectedCol = col;
-			if (currentPlayer == CheckersData.RED)
-				message.setText("RED:  Make your move.");
-			else
-				message.setText("BLACK:  Make your move.");
-			repaint();
-			return;
-		}
-
-
-		if (selectedRow < 0) {
-			message.setText("Click the piece you want to move.");
-			return;
-		}
-
 		if (usingPowerUp) {
+			System.out.println("Chosen target: (" + col + "," + row + ")");
 			CheckersMove[] moves = selectedPowerUp.moves(board.getBoardCopy(), new Point(powerUpCol, powerUpRow));
+			System.out.println(moves.length + " moves");
 
 			for (int i = 0; i < moves.length; i++) {
-				if (moves[i].fromRow == selectedRow && moves[i].fromCol == selectedCol
-						&& moves[i].toRow == row && moves[i].toCol == col) {
+				System.out.println("(" + moves[i].fromCol + "," + moves[i].fromRow + ") -> (" + moves[i].toCol + "," + moves[i].toRow + ")");
+				if (moves[i].fromRow == selectedRow && moves[i].fromCol == selectedCol && moves[i].toRow == row && moves[i].toCol == col) {
+					System.out.println("move valid");
+
 					if (!vsAI)
 						doMakeMove(moves[i]);
 					else
@@ -323,6 +309,24 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				}
 			}
 		} else {
+			for (int i = 0; i < legalMoves.length; i++)
+			if (legalMoves[i].fromRow == row && legalMoves[i].fromCol == col) {
+				selectedRow = row;
+				selectedCol = col;
+				if (currentPlayer == CheckersData.RED)
+					message.setText("RED:  Make your move.");
+				else
+					message.setText("BLACK:  Make your move.");
+				repaint();
+				return;
+			}
+
+
+			if (selectedRow < 0) {
+				message.setText("Click the piece you want to move.");
+				return;
+			}
+
 			for (int i = 0; i < legalMoves.length; i++) {
 				if (legalMoves[i].fromRow == selectedRow && legalMoves[i].fromCol == selectedCol
 						&& legalMoves[i].toRow == row && legalMoves[i].toCol == col) {
@@ -333,10 +337,9 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 					return;
 				}
 			}
-		}
-		
-		message.setText("Click the square you want to move to.");
 
+			message.setText("Click the square you want to move to.");
+		}
 	}  // end doClickSquare()
 
 
@@ -351,6 +354,11 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		// Check if PowerUp needs to spawn
 		if (combatMode)
 			board.setUpGame(board.powerUpSys.spawnPowerUp(board.getBoardCopy()));
+
+		if (usingPowerUp) {
+			usingPowerUp = false;
+			hidePowerUpInfo();
+		}
 		
 		/* If the move was a jump, it's possible that the player has another
 		jump.  Check for legal jumps starting from the square that the player
@@ -631,6 +639,17 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				selectedPowerUp = board.powerUpSys.blk_powers.get(new Point(powerUpCol, powerUpRow));
 				break;
 		}
+		prevMessage = message.getText();
+
+		switch (currentPlayer) {
+			case CheckersData.RED:
+				message.setText("RED: Choose your target.");
+				break;
+			case CheckersData.BLACK:
+				message.setText("BLACK: Choose your target.");
+				break;
+		}
+
 		powerUpButton.setText("Cancel");
 
 		repaint();
@@ -641,6 +660,8 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		powerUpRow = -1;
 		powerUpCol = -1;
 		selectedPowerUp = null;
+
+		message.setText(prevMessage);
 		powerUpButton.setText("Use");
 
 		repaint();
@@ -702,6 +723,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				} else {
 					hidePowerUpInfo();
 				}
+
 				for (int i = 0; i < moves.length; i++) {
 					if (moves[i].fromCol == selectedCol && moves[i].fromRow == selectedRow)
 						drawHighlight(g2D, new Color(0, 238, 0), moves[i].toCol, moves[i].toRow);
