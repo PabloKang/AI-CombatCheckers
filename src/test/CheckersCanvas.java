@@ -325,7 +325,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		
 		// Check if PowerUp needs to spawn
 		if (combatMode)
-			board = board.powerUpSys.spawnPowerUp(board);
+			board.setUpGame(board.powerUpSys.spawnPowerUp(board.getBoardCopy()));
 		
 		/* If the move was a jump, it's possible that the player has another
 		jump.  Check for legal jumps starting from the square that the player
@@ -403,7 +403,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		
 		// Check if PowerUp needs to spawn
 		if (combatMode)
-			board = board.powerUpSys.spawnPowerUp(board);
+			board.setUpGame(board.powerUpSys.spawnPowerUp(board.getBoardCopy()));
 		
 		if(currentPlayer == firstAI.player && move == null) {
 			doResignAI();
@@ -525,7 +525,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		
 		// Check if PowerUp needs to spawn
 		if (combatMode)
-			board = board.powerUpSys.spawnPowerUp(board);
+			board.setUpGame(board.powerUpSys.spawnPowerUp(board.getBoardCopy()));
 		
 		System.out.println("Game still happening");
 		if(move == null) {
