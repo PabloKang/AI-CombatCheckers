@@ -68,49 +68,61 @@ class PowerUpSystem {
 	}
 	
 	
-	public void movePowerUp(Point p, int piece, Point q)
+	public void movePowerUp(Point user, int userPiece, Point destination)
 	{
 		PowerUp pUp;
 		
-		if(piece == CheckersData.BLACK || piece == CheckersData.BLACK_KING ) {
-			pUp = blk_powers.remove(p);
-			blk_powers.put(q, pUp);
+		if(userPiece == CheckersData.BLACK || userPiece == CheckersData.BLACK_KING ) {
+			pUp = blk_powers.remove(user);
+			blk_powers.put(destination, pUp);
 		}
-		else if(piece == CheckersData.RED || piece == CheckersData.RED_KING ) {
-			pUp = red_powers.remove(p);
-			red_powers.put(q, pUp);
+		else if(userPiece == CheckersData.RED || userPiece == CheckersData.RED_KING ) {
+			pUp = red_powers.remove(user);
+			red_powers.put(destination, pUp);
 		}
 	}
 	
 	
-	public void removePowerUp(Point p, int piece) 
+	public void removePowerUp(Point user, int userPiece) 
 	{
-		if(piece == CheckersData.BLACK || piece == CheckersData.BLACK_KING ) {
-			blk_powers.remove(p);
+		if(userPiece == CheckersData.BLACK || userPiece == CheckersData.BLACK_KING ) {
+			blk_powers.remove(user);
 		}
-		else if(piece == CheckersData.RED || piece == CheckersData.RED_KING ) {
-			red_powers.remove(p);
+		else if(userPiece == CheckersData.RED || userPiece == CheckersData.RED_KING ) {
+			red_powers.remove(user);
 		}
 	}
 	
 	
 	// Execute a power from the user to the target.
-	public CheckersData usePowerUp(CheckersData board, Point user, Point target)
+	public int[][] usePowerUp(int[][] board, Point user, Point target)
 	{
-		int piece = board.pieceAt(user.y, user.x);
+		int piece = board[user.y][user.x];
 		 
 		if(piece == CheckersData.BLACK || piece == CheckersData.BLACK_KING ) {
-			return blk_powers.get(user).execute(board, user, target);
+			// Use PowerUp
+			board = blk_powers.get(user).execute(board, target);
+			// Remove PowerUp from power hashmap and board
+			blk_powers.remove(user);
+			board[user.y][user.x] = piece % 10;
+			
+			return board;
 		}
 		else if(piece == CheckersData.RED || piece == CheckersData.RED_KING ) {
-			return red_powers.get(user).execute(board, user, target);
+			// Use PowerUp
+			board = red_powers.get(user).execute(board, target);
+			// Remove PowerUp from power hashmap and board
+			red_powers.remove(user);
+			board[user.y][user.x] = piece % 10;
+			
+			return board;
 		}
 		return board;
 	}
 	
 	
 	// Roll. If true, spawn a power-up on a random empty tile on the board.
-	public CheckersData spawnPowerUp(CheckersData board)
+	public int[][] spawnPowerUp(int[][] board)
 	{
 		Random rand = new Random();
 		if (rand.nextInt(100) <= spawnThresh) {
@@ -118,8 +130,8 @@ class PowerUpSystem {
 			do {
 				int row = rand.nextInt(CheckersData.HEIGHT-1);
 				int col = rand.nextInt(CheckersData.WIDTH-1);
-				if(row % 2 == col % 2 && board.pieceAt(row, col) == CheckersData.EMPTY){
-					board.setPieceAt(row, col, pSelector.randomType()*10);
+				if(row % 2 == col % 2 && board[row][col] == CheckersData.EMPTY){
+					board[row][col] = pSelector.randomType()*10;
 					System.out.println("Spawned PowerUp at [" + row + "]["+col+"]");
 					break;
 				}
