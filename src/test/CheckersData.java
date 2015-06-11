@@ -51,26 +51,38 @@ class CheckersData {
 		setUpGame();
 	}
 	
-	public void recount() {
+	public void recount(int[][] old) {
 		RED_MEN = 0;
 		BLACK_MEN = 0;
 		RED_KINGS = 0;
 		BLACK_KINGS = 0;
 		for(int i = 0; i < 8; i++)
 			for(int j = 0; j < 8; j++)
-				switch(board[i][j]%10) {
-				case RED:
-					RED_MEN++;
-					break;
-				case BLACK:
-					BLACK_MEN++;
-					break;
-				case RED_KING:
-					RED_KINGS++;
-					break;
-				case BLACK_KING:
-					BLACK_KINGS++;
-					break;
+				switch(board[i][j] % 10) {
+					case RED:
+						RED_MEN++;
+						break;
+					case BLACK:
+						BLACK_MEN++;
+						break;
+					case RED_KING:
+						RED_KINGS++;
+						break;
+					case BLACK_KING:
+						BLACK_KINGS++;
+						break;
+					case EMPTY:
+						switch (old[i][j]) {
+							case RED:
+							case RED_KING:
+								powerUpSys.red_powers.remove(new Point(j, i));
+								break;
+							case BLACK:
+							case BLACK_KING:
+								powerUpSys.blk_powers.remove(new Point(j, i));
+								break;
+						}
+						break;
 				}
 	}
 
@@ -276,36 +288,41 @@ class CheckersData {
 		
 		if(power) {
 			int piece = board[fromRow][fromCol] % 10;
+			board[fromRow][fromCol] = piece;
 			PowerUp p = null;
 
 			switch (piece) {
 				case RED:
 				case RED_KING:
-					p = powerUpSys.red_powers.get(new Point(fromRow, fromCol));
+					p = powerUpSys.red_powers.get(new Point(fromCol, fromRow));
+					powerUpSys.red_powers.remove(new Point(fromCol, fromRow));
 					break;
 				case BLACK:
 				case BLACK_KING:
-					p = powerUpSys.blk_powers.get(new Point(fromRow, fromCol));
+					p = powerUpSys.blk_powers.get(new Point(fromCol, fromRow));
+					powerUpSys.blk_powers.remove(new Point(fromCol, fromRow));
 					break;
 			}
-			p.execute(board, new Point(toRow, toCol));
-			recount();
-			
-			
+			int[][] old = p.execute(board, new Point(toCol, toRow));
+			recount(old);
 		}
 		else {
 			int target = board[toRow][toCol];	// Value of space a piece moved to
 			int powerPiece = board[fromRow][fromCol]/10;
 			
-			if(target == 0)
+			if (target == 0) {
 				board[toRow][toCol] = board[fromRow][fromCol];
-			else
+				powerUpSys.movePowerUp(new Point(fromCol, fromRow), parsePiece(board[fromRow][fromCol]), new Point(toCol, toRow));
+			} else
 				board[toRow][toCol] = board[fromRow][fromCol] % 10 + target;
-				board[fromRow][fromCol] = EMPTY;
+
+			board[fromRow][fromCol] = EMPTY;
 			
 			// CAPTURING PIECES WITH JUMPS
 			if (fromRow - toRow == 2 || fromRow - toRow == -2) {
-				removePieceAt((fromRow + toRow) / 2, (fromCol + toCol) / 2);			
+				int captured = parsePiece(board[(fromRow + toRow) / 2][(fromCol + toCol) / 2]);
+				removePieceAt((fromRow + toRow) / 2, (fromCol + toCol) / 2);
+				powerUpSys.removePowerUp(new Point((fromCol + toCol) / 2, (fromRow + toRow) / 2), captured);
 			}
 			
 			// KINGING REDS
@@ -333,6 +350,7 @@ class CheckersData {
 				
 				// Generate random PowerUp of pType
 				powerUpSys.listPowerUp(new Point(toCol,toRow), piece, powerUpSys.getRandomPowerUp(pType));
+				powerUpSys.removePowerUp(new Point(fromCol, fromRow), piece);
 			}
 		}
 	}

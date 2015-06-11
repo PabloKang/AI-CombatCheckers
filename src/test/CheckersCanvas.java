@@ -287,6 +287,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		newGameButton.setEnabled(true);
 		resignButton.setEnabled(false);
 		gameInProgress = false;
+		repaint();
 	}
 	
 	
@@ -344,6 +345,11 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 
 
 	void doMakeMove(CheckersMove move) {
+		if (usingPowerUp) {
+			usingPowerUp = false;
+			cancelPowerUp();
+			hidePowerUpInfo();
+		}
 
 		// This is called when the current player has chosen the specified
 		// move.  Make the move, and then either end or continue the game
@@ -355,11 +361,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		if (combatMode)
 			board.setUpGame(board.powerUpSys.spawnPowerUp(board.getBoardCopy()));
 
-		if (usingPowerUp) {
-			usingPowerUp = false;
-			hidePowerUpInfo();
-		}
-		
+
 		/* If the move was a jump, it's possible that the player has another
 		jump.  Check for legal jumps starting from the square that the player
 		just moved to.  If there are any, the player must jump.  The same
@@ -728,6 +730,8 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 					if (moves[i].fromCol == selectedCol && moves[i].fromRow == selectedRow)
 						drawHighlight(g2D, new Color(0, 238, 0), moves[i].toCol, moves[i].toRow);
 				}
+			} else {
+				hidePowerUpInfo();
 			}
 		}
 

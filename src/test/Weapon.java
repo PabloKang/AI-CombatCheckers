@@ -48,29 +48,32 @@ class Laser extends Weapon
 	public CheckersMove[] moves(int[][] board, Point user) 
 	{
 		ArrayList<CheckersMove> laserMoveList = new ArrayList<CheckersMove>();
-		Point[] paths = new Point[4];
-		paths[0] = new Point(-1,-1);
-		paths[1] = new Point(1,-1);
-		paths[2] = new Point(-1,1);
-		paths[3] = new Point(1,1);
-		
-		for(int i = 0; i < 4; i++) {
-			Point path = paths[i];
-			Point p = user;
-			int pCode;
-			
-			while(p.x < 8 && p.x >= 0 && p.y < 8 && p.y >= 0) {
-				pCode = board[p.x][p.y];
-				
-				if (pCode % 10 != 0) {
-					laserMoveList.add(new CheckersMove(user.y,user.x,p.y,p.x,true));
-					break;
-				}
-				else{
-					p.move(p.x + path.x, p.y + path.y);
-				}
+		int x = user.x;
+		int y = user.y;
+
+		for (int i = -1; i <= 1; i += 2) {
+			for (int j = -1; j <= 1; j += 2) {
+					int pCode;
+
+					int xi = x + i;
+					int yj = y + j;
+
+					while (xi < 8 && xi >= 0 && yj < 8 && yj >= 0) {
+						System.out.println("checking (" + xi + "," + yj + ")");
+						pCode = CheckersData.parsePiece(board[yj][xi]);
+
+						if (pCode != CheckersData.EMPTY) {
+							laserMoveList.add(new CheckersMove(user.y, user.x, yj, xi, true));
+							System.out.println("new laser target: (" + xi + "," + yj + ")");
+							break;
+						} else {
+							xi += i;
+							yj += j;
+						}
+					}
 			}
 		}
+
 		CheckersMove[] laserMoves = new CheckersMove[laserMoveList.size()];
 		laserMoves = laserMoveList.toArray(laserMoves);
 		
@@ -108,20 +111,20 @@ class Bomb extends Weapon
 		Point p = target;
 		
 		// Kill yourself
-		board[p.x][p.y] = CheckersData.EMPTY;
+		board[p.y][p.x] = CheckersData.EMPTY;
 		
 		// Kill neighbors
-		if(p.x > 0 && p.y > 0) { 						// Top left
-			board[p.x-1][p.y-1] = CheckersData.EMPTY;
+		if(p.y > 0 && p.x > 0) { 						// Top left
+			board[p.y-1][p.x-1] = CheckersData.EMPTY;
 		}
-		if(p.x < 8 && p.y > 0) { 				// Top right
-			board[p.x+1][p.y-1] = CheckersData.EMPTY;
+		if(p.y < 8 && p.x > 0) { 				// Top right
+			board[p.y+1][p.x-1] = CheckersData.EMPTY;
 		}
-		if(p.x > 0 && p.y < 8) { 			// Bottom left
-			board[p.x-1][p.y+1] = CheckersData.EMPTY;
+		if(p.y > 0 && p.x < 8) { 			// Bottom left
+			board[p.y-1][p.x+1] = CheckersData.EMPTY;
 		}
-		if(p.x < 8 && p.y < 8) { 	// Bottom right
-			board[p.x+1][p.y+1] = CheckersData.EMPTY;
+		if(p.y < 8 && p.x < 8) { 	// Bottom right
+			board[p.y+1][p.x+1] = CheckersData.EMPTY;
 		}
 		
 		return board;
@@ -145,24 +148,27 @@ class AirStrike extends Weapon
 	public CheckersMove[] moves(int[][] board, Point user) 
 	{
 		ArrayList<CheckersMove> aStrikeMoveList = new ArrayList<CheckersMove>();
-		int pCode = board[user.x][user.y];
-		
+		int pCode = CheckersData.parsePiece(board[user.y][user.x]);
+
 		for (int row = 0; row < 8; row++) {
 			for (int col = 0; col < 8; col++) {
 				int tCode = CheckersData.parsePiece(board[row][col]);
-				
+
 				if (row % 2 == col % 2 && tCode != CheckersData.EMPTY) {
-					if((pCode == CheckersData.BLACK || pCode == CheckersData.BLACK_KING) && (tCode == CheckersData.RED || tCode == CheckersData.RED_KING))
+					if((pCode == CheckersData.BLACK || pCode == CheckersData.BLACK_KING) && (tCode == CheckersData.RED || tCode == CheckersData.RED_KING)) {
 						aStrikeMoveList.add(new CheckersMove(user.y, user.x, row, col, true));
-					if((pCode == CheckersData.RED || pCode == CheckersData.RED_KING) && (tCode == CheckersData.BLACK || tCode == CheckersData.BLACK_KING))
+					}
+
+					if((pCode == CheckersData.RED || pCode == CheckersData.RED_KING) && (tCode == CheckersData.BLACK || tCode == CheckersData.BLACK_KING)) {
 						aStrikeMoveList.add(new CheckersMove(user.y, user.x, row, col, true));
+					}
 				}
 			}
 		}
 
 		CheckersMove[] aStrikeMoves = new CheckersMove[aStrikeMoveList.size()];
 		aStrikeMoves = aStrikeMoveList.toArray(aStrikeMoves);
-		
+
 		return aStrikeMoves;
 	}
 }
