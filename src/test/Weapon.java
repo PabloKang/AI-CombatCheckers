@@ -54,15 +54,10 @@ class Laser extends Weapon
 		paths[2] = new Point(-1,1);
 		paths[3] = new Point(1,1);
 		
-<<<<<<< HEAD
-		while(p.x < board.WIDTH && p.x >= 0 && p.y < board.HEIGHT && p.y >= 0) {
-			pCode = board.pieceAt(p.y, p.x);
-=======
 		for(int i = 0; i < 4; i++) {
 			Point path = paths[i];
 			Point p = user;
 			int pCode;
->>>>>>> 1a04a6b374235e02e452fc2418c7c21565ce7c00
 			
 			while(p.x < 8 && p.x >= 0 && p.y < 8 && p.y >= 0) {
 				pCode = board[p.y][p.x];
@@ -97,11 +92,6 @@ class Bomb extends Weapon
 		type = "bomb";
 	}
 
-<<<<<<< HEAD
-	// Execute Laser
-	public CheckersData execute(CheckersData board, Point user, Point target)
-	{
-=======
 	// Find and return all possible moves for this bomb
 	@Override
 	public CheckersMove[] moves(int[][] board, Point user) 
@@ -135,7 +125,6 @@ class Bomb extends Weapon
 			board[p.x+1][p.y+1] = CheckersData.EMPTY;
 		}
 		
->>>>>>> 1a04a6b374235e02e452fc2418c7c21565ce7c00
 		return board;
 	}
 }
@@ -152,12 +141,6 @@ class AirStrike extends Weapon
 		type = "air strike";
 	}
 
-<<<<<<< HEAD
-	// Execute Laser
-	public CheckersData execute(CheckersData board, Point user, Point target)
-	{
-		return board;
-=======
 	// Find and return all possible moves for this air strike
 	@Override
 	public CheckersMove[] moves(int[][] board, Point user) 
@@ -182,6 +165,5 @@ class AirStrike extends Weapon
 		aStrikeMoves = aStrikeMoveList.toArray(aStrikeMoves);
 		
 		return aStrikeMoves;
->>>>>>> 1a04a6b374235e02e452fc2418c7c21565ce7c00
 	}
 }
