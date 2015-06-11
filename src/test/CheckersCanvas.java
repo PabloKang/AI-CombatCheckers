@@ -210,12 +210,15 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		newGameButton.setEnabled(false);
 		resignButton.setEnabled(true);
 		repaint();
-		if(!combatMode) 
-			if(firstAI.player == currentPlayer)
+		if(!combatMode) {
+			if (firstAI.player == currentPlayer) {
 				doMakeMoveAI(firstAI.makeMove(board));
-		else
-			if(firstCombatAI.player == currentPlayer)
+			}
+		} else {
+			if (firstCombatAI.player == currentPlayer) {
 				doMakeMoveAI(firstCombatAI.makeMove(board));
+			}
+		}
 	}
 
 	void doNewAIvsAIGame() {
@@ -267,16 +270,21 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			gameOver("RED resigns.  BLACK wins.");
 		else
 			gameOver("BLACK resigns.  RED wins.");
-		if(currentPlayer == firstAI.player)
-			if(!combatMode)
+
+		if (!combatMode) {
+			if (currentPlayer == firstAI.player) {
 				firstAI.lostGame();
-			else
-				firstCombatAI.lostGame();
-		else
-			if(!combatMode)
+			} else {
 				firstAI.wonGame();
-			else
+			}
+		} else {
+			if (currentPlayer == firstCombatAI.player) {
+				firstCombatAI.lostGame();
+			} else {
 				firstCombatAI.wonGame();
+			}
+		}
+
 		gameInProgress = false;
 	}
 
@@ -603,7 +611,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		while(gameInProgress) {
 			repaint();
 			try {
-				Thread.sleep(500);
+				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
