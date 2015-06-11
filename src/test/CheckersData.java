@@ -35,7 +35,7 @@ class CheckersData {
 	HEIGHT = 8,
 	WIDTH = 8;
 	
-	public static PowerUpSystem powerUpSys;
+	public PowerUpSystem powerUpSys;
 
 	private int[][] board;  // board[r][c] is the contents of row r, column c.  
 
@@ -184,6 +184,8 @@ class CheckersData {
 	public void setUpGame(int[][] b) {
 		BLACK_MEN = 0;
 		RED_MEN = 0;
+		BLACK_KINGS = 0;
+		RED_KINGS = 0;
 		for(int row = 0; row < 8; row++) {
 			for(int col = 0; col < 8; col++) {
 				board[row][col] = b[row][col];
@@ -204,6 +206,18 @@ class CheckersData {
 			}
 		}
 	} // end setUpGame(int[][] b)
+	
+	public void setUpGame(CheckersData b) {
+		BLACK_MEN = b.numBlackMen();
+		BLACK_KINGS = b.numBlackKings();
+		RED_MEN = b.numRedMen();
+		RED_KINGS = b.numRedKings();
+		powerUpSys = b.powerUpSys.getCopy();
+		for(int row = 0; row < 8; row++)
+			for(int col = 0; col < 8; col++)
+				board[row][col] = b.getBoardCopy()[row][col];
+		
+	}
 
 	public int[][] getBoardCopy() {
 		int[][] b = new int[8][8];
