@@ -36,6 +36,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 
 	private HashMap<String, BufferedImage> images;
 
+
 	private int boardLength;
 	private double xOffset;
 	private double yOffset;
@@ -49,9 +50,12 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 
 	boolean vsAI = false;
 	boolean combatMode = false;
+	boolean usingPowerUp = false;
 
 	int currentPlayer;
 	int selectedRow, selectedCol;
+	int powerUpRow, powerUpCol;
+	PowerUp selectedPowerUp;
 	CheckersMove[] legalMoves;
 	int winner;
 	
@@ -76,6 +80,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		powerUpLabel = new JLabel(" ", JLabel.CENTER);
 		powerUpImage = new JLabel("No power-up selected", JLabel.CENTER);
 		powerUpButton = new JButton("Use");
+		powerUpButton.addActionListener(this);
 		powerUpButton.setEnabled(false);
 
 		message = new JLabel("", JLabel.CENTER);
@@ -142,7 +147,11 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			setupGame();
 		else if (src == resignButton)
 			doResign();
-			
+		else if (src == powerUpButton)
+			if (usingPowerUp)
+				cancelPowerUp();
+			else
+				usePowerUp();
 	}
 
 	
@@ -298,16 +307,31 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			message.setText("Click the piece you want to move.");
 			return;
 		}
-		
 
-		for (int i = 0; i < legalMoves.length; i++)
-		if (legalMoves[i].fromRow == selectedRow && legalMoves[i].fromCol == selectedCol
-				&& legalMoves[i].toRow == row && legalMoves[i].toCol == col) {
-			if(!vsAI)
-				doMakeMove(legalMoves[i]);
-			else
-				doMakeMoveAI(legalMoves[i]);
-			return;
+		if (usingPowerUp) {
+			CheckersMove[] moves = selectedPowerUp.moves(board.getBoardCopy(), new Point(powerUpCol, powerUpRow));
+
+			for (int i = 0; i < moves.length; i++) {
+				if (moves[i].fromRow == selectedRow && moves[i].fromCol == selectedCol
+						&& moves[i].toRow == row && moves[i].toCol == col) {
+					if (!vsAI)
+						doMakeMove(moves[i]);
+					else
+						doMakeMoveAI(moves[i]);
+					return;
+				}
+			}
+		} else {
+			for (int i = 0; i < legalMoves.length; i++) {
+				if (legalMoves[i].fromRow == selectedRow && legalMoves[i].fromCol == selectedCol
+						&& legalMoves[i].toRow == row && legalMoves[i].toCol == col) {
+					if (!vsAI)
+						doMakeMove(legalMoves[i]);
+					else
+						doMakeMoveAI(legalMoves[i]);
+					return;
+				}
+			}
 		}
 		
 		message.setText("Click the square you want to move to.");
@@ -593,6 +617,33 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		
 	}
 
+	public void usePowerUp() {
+		usingPowerUp = true;
+		powerUpRow = selectedRow;
+		powerUpCol = selectedCol;
+
+		switch (currentPlayer) {
+			case CheckersData.RED:
+				selectedPowerUp = board.powerUpSys.red_powers.get(new Point(powerUpCol, powerUpRow));
+				break;
+			case CheckersData.BLACK:
+				selectedPowerUp = board.powerUpSys.blk_powers.get(new Point(powerUpCol, powerUpRow));
+				break;
+		}
+		powerUpButton.setText("Cancel");
+
+		repaint();
+	}
+
+	public void cancelPowerUp() {
+		usingPowerUp = false;
+		powerUpRow = -1;
+		powerUpCol = -1;
+		selectedPowerUp = null;
+		powerUpButton.setText("Use");
+
+		repaint();
+	}
 
 	public void update(Graphics g) {
 		// The paint method completely redraws the canvas, so don't erase
@@ -632,9 +683,15 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			}
 		}
 
+		CheckersMove[] moves = legalMoves;
+
 		if (gameInProgress) {
-			for (int i = 0; i < legalMoves.length; i++) {
-				drawHighlight(g2D, new Color(0, 238, 238), legalMoves[i].fromCol, legalMoves[i].fromRow);
+			if (usingPowerUp && selectedPowerUp != null) {
+				moves = selectedPowerUp.moves(board.getBoardCopy(), new Point(powerUpCol, powerUpRow));
+			}
+
+			for (int i = 0; i < moves.length; i++) {
+				drawHighlight(g2D, new Color(0, 238, 238), moves[i].fromCol, moves[i].fromRow);
 			}
 
 			if (selectedRow >= 0) {
@@ -644,9 +701,9 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				} else {
 					hidePowerUpInfo();
 				}
-				for (int i = 0; i < legalMoves.length; i++) {
-					if (legalMoves[i].fromCol == selectedCol && legalMoves[i].fromRow == selectedRow)
-						drawHighlight(g2D, new Color(0, 238, 0), legalMoves[i].toCol, legalMoves[i].toRow);
+				for (int i = 0; i < moves.length; i++) {
+					if (moves[i].fromCol == selectedCol && moves[i].fromRow == selectedRow)
+						drawHighlight(g2D, new Color(0, 238, 0), moves[i].toCol, moves[i].toRow);
 				}
 			}
 		}
