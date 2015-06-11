@@ -51,6 +51,12 @@ class PowerUpSystem {
 		pSelector = new PowerUpSelector();
 	}
 	
+	public PowerUpSystem getCopy() {
+		PowerUpSystem pow = new PowerUpSystem();
+		pow.blk_powers = blk_powers;
+		pow.red_powers = red_powers;
+		return pow;
+	}
 	
 	public PowerUp getRandomPowerUp(int type)
 	{

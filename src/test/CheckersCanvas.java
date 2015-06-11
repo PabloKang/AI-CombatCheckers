@@ -65,6 +65,11 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	double[] w3 = {0.25, 0.4, 0.15, 0.2};
 	double[] w4 = {0.2, 0.5, 0.1, 0.2};
 	
+	double[] c1 = {0.1, 0.3, 0.2, 0.15, 0.25};
+	double[] c2 = {0.05, 0.45, 0.05, 0.1, 0.35};
+	double[] c3 = {0.05, 0.35, 0.2, 0.1, 0.3};
+	double[] c4 = {0.05, 0.4, 0.05, 0.05, 0.45};
+	
 	
 	public CheckersCanvas() {
 		setBackground(Color.black);
@@ -188,7 +193,10 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			opponent = CheckersData.BLACK;
 		else
 			opponent = currentPlayer;
-		firstAI = new AI(aiPlayer, opponent, ".\\data\\text.txt", false, w1, w2);
+		if(!combatMode)
+			firstAI = new AI(aiPlayer, opponent, ".\\data\\text.txt", false, w1, w2);
+		else
+			firstCombatAI = new AI(aiPlayer, opponent, ".\\data\\combat1.txt", true, c1, c2);
 		legalMoves = board.getLegalMoves(CheckersData.RED);  // Get RED's legal moves.
 		selectedRow = -1;   // RED has not yet selected a piece to move.
 		message.setText("Red:  Make your move.");
@@ -196,11 +204,12 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		newGameButton.setEnabled(false);
 		resignButton.setEnabled(true);
 		repaint();
-		if(firstAI.player == currentPlayer) {
-			CheckersData copy = new CheckersData();
-			copy.setUpGame(board.getBoardCopy());
-			doMakeMoveAI(firstAI.makeMove(copy));
-		}
+		if(!combatMode) 
+			if(firstAI.player == currentPlayer)
+				doMakeMoveAI(firstAI.makeMove(board));
+		else
+			if(firstCombatAI.player == currentPlayer)
+				doMakeMoveAI(firstCombatAI.makeMove(board));
 	}
 
 	void doNewAIvsAIGame() {
@@ -211,9 +220,14 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		turnNumber = 0;
 		board.setUpGame();
 		currentPlayer = CheckersData.RED;
-
-		firstAI = new AI(currentPlayer, CheckersData.BLACK, ".\\data\\text.txt", false, w1, w2);
-		secondAI = new AI(CheckersData.BLACK, currentPlayer, ".\\data\\text2.txt", false, w1, w2);
+		if(!combatMode) {
+			firstAI = new AI(currentPlayer, CheckersData.BLACK, ".\\data\\text.txt", false, w1, w2);
+			secondAI = new AI(CheckersData.BLACK, currentPlayer, ".\\data\\text2.txt", false, w3, w4);
+		}
+		else {
+			firstCombatAI = new AI(currentPlayer, CheckersData.BLACK, ".\\data\\combat1.txt", true, c1, c2);
+			secondCombatAI = new AI(CheckersData.BLACK, currentPlayer, ".\\data\\combat2.txt", true, c3, c4);
+		}
 		legalMoves = board.getLegalMoves(CheckersData.RED);
 		selectedRow = -1;
 		message.setText("Red: Make your move.");
@@ -243,20 +257,20 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			message.setText("There is no game in progress!");
 			return;
 		}
-		if (currentPlayer == CheckersData.RED) {
+		if (currentPlayer == CheckersData.RED) 
 			gameOver("RED resigns.  BLACK wins.");
-			if(currentPlayer == firstAI.player)
-				firstAI.lostGame();
-			else
-				firstAI.wonGame();
-		}
-		else {
+		else
 			gameOver("BLACK resigns.  RED wins.");
-			if(currentPlayer == firstAI.player)
+		if(currentPlayer == firstAI.player)
+			if(!combatMode)
 				firstAI.lostGame();
 			else
+				firstCombatAI.lostGame();
+		else
+			if(!combatMode)
 				firstAI.wonGame();
-		}
+			else
+				firstCombatAI.wonGame();
 		gameInProgress = false;
 	}
 
@@ -267,13 +281,25 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			gameOver("BLACK resigns. RED wins.");
 		
 		if(currentPlayer == firstAI.player) {
-			firstAI.lostGame();
-			secondAI.wonGame();
+			if(!combatMode) {
+				firstAI.lostGame();
+				secondAI.wonGame();
+			}
+			else {
+				firstCombatAI.lostGame();
+				secondCombatAI.wonGame();
+			}
 			winner = 2;
 		}
 		else {
-			secondAI.lostGame();
-			firstAI.wonGame();
+			if(!combatMode) {
+				secondAI.lostGame();
+				firstAI.wonGame();
+			}
+			else {
+				secondCombatAI.lostGame();
+				firstCombatAI.wonGame();
+			}
 			winner = 1;
 		}
 		gameInProgress = false;
@@ -440,9 +466,17 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		if (combatMode)
 			board.setUpGame(board.powerUpSys.spawnPowerUp(board.getBoardCopy()));
 		
-		if(currentPlayer == firstAI.player && move == null) {
-			doResignAI();
-			return;
+		if(!combatMode) {
+			if(currentPlayer == firstAI.player && move == null) {
+				doResignAI();
+				return;
+			}
+		}
+		else {
+			if(currentPlayer == firstCombatAI.player && move == null) {
+				doResignAI();
+				return;
+			}
 		}
 
 		board.makeMove(move);
@@ -459,10 +493,19 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				selectedRow = move.toRow;  // Since only one piece can be moved, select it.
 				selectedCol = move.toCol;
 				repaint();
-				if(firstAI.player == currentPlayer) {
-					CheckersData copy = new CheckersData();
-					copy.setUpGame(board.getBoardCopy());
-					doMakeMoveAI(firstAI.makeMove(copy));
+				if(!combatMode) {
+					if(firstAI.player == currentPlayer) {
+						CheckersData copy = new CheckersData();
+						copy.setUpGame(board);
+						doMakeMoveAI(firstAI.makeMove(copy));
+					}
+				}
+				else {
+					if(firstCombatAI.player == currentPlayer) {
+						CheckersData copy = new CheckersData();
+						copy.setUpGame(board);
+						doMakeMoveAI(firstCombatAI.makeMove(copy));
+					}
 				}
 				return;
 			}
@@ -474,9 +517,14 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			legalMoves = board.getLegalMoves(currentPlayer);
 			if (legalMoves == null) {
 				gameOver("BLACK has no moves.  RED wins.");
-				if(firstAI.player == currentPlayer)
-					firstAI.lostGame();
-				else firstAI.wonGame();
+				if(!combatMode)
+					if(firstAI.player == currentPlayer)
+						firstAI.lostGame();
+					else firstAI.wonGame();
+				else
+					if(firstCombatAI.player == currentPlayer)
+						firstCombatAI.lostGame();
+					else firstCombatAI.wonGame();
 				return;
 			}
 			else if (legalMoves[0].isJump())
@@ -489,9 +537,14 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			legalMoves = board.getLegalMoves(currentPlayer);
 			if (legalMoves == null) {
 				gameOver("RED has no moves.  BLACK wins.");
-				if(firstAI.player == currentPlayer)
-					firstAI.lostGame();
-				else firstAI.wonGame();
+				if(!combatMode)
+					if(firstAI.player == currentPlayer)
+						firstAI.lostGame();
+					else firstAI.wonGame();
+				else
+					if(firstCombatAI.player == currentPlayer)
+						firstCombatAI.lostGame();
+					else firstCombatAI.wonGame();
 				return;
 			}
 			else if (legalMoves[0].isJump())
@@ -515,11 +568,19 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				selectedCol = legalMoves[0].fromCol;
 			}
 		}
-		
-		if(firstAI.player == currentPlayer) {
-			CheckersData copy = new CheckersData();
-			copy.setUpGame(board.getBoardCopy());
-			doMakeMoveAI(firstAI.makeMove(copy));
+		if(!combatMode) {
+			if(firstAI.player == currentPlayer) {
+				CheckersData copy = new CheckersData();
+				copy.setUpGame(board);
+				doMakeMoveAI(firstAI.makeMove(copy));
+			}
+		}
+		else {
+			if(firstCombatAI.player == currentPlayer) {
+				CheckersData copy = new CheckersData();
+				copy.setUpGame(board);
+				doMakeMoveAI(firstCombatAI.makeMove(copy));
+			}
 		}
 		
 		repaint();
@@ -534,10 +595,16 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			if(firstAI.player == currentPlayer) 
-				doMakeMoveAI(firstAI.makeMove(board));
+			if(!combatMode)
+				if(firstAI.player == currentPlayer) 
+					doMakeMoveAIvsAI(firstAI.makeMove(board));
+				else
+					doMakeMoveAIvsAI(secondAI.makeMove(board));
 			else
-				doMakeMoveAI(secondAI.makeMove(board));
+				if(firstCombatAI.player == currentPlayer) 
+					doMakeMoveAIvsAI(firstCombatAI.makeMove(board));
+				else
+					doMakeMoveAIvsAI(secondCombatAI.makeMove(board));
 		}
 		String msg = "AI vs AI game over. Winner : ";
 		switch(winner) {
@@ -570,8 +637,14 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		if(turnNumber >= 50) {
 			if(drawDetection(move)) {
 				gameOver("Game is a draw.");
-				firstAI.drawGame();
-				secondAI.drawGame();
+				if(!combatMode) {
+					firstAI.drawGame();
+					secondAI.drawGame();
+				}
+				else {
+					firstCombatAI.drawGame();
+					secondCombatAI.drawGame();
+				}
 				gameInProgress = false;
 				winner = 0;
 				return;
@@ -588,7 +661,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				//selectedRow = move.toRow;
 				//selectedCol = move.toCol;
 				CheckersData copy = new CheckersData();
-				copy.setUpGame(board.getBoardCopy());
+				copy.setUpGame(board);
 				repaint();
 				return;
 			}
@@ -599,8 +672,14 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			legalMoves = board.getLegalMoves(currentPlayer);
 			if(legalMoves == null) {
 				gameOver("BLACK has no moves. RED wins.");
-				secondAI.lostGame();
-				firstAI.wonGame();
+				if(!combatMode) {
+					secondAI.lostGame();
+					firstAI.wonGame();
+				}
+				else {
+					secondCombatAI.lostGame();
+					firstCombatAI.wonGame();
+				}
 				winner = 1;
 				return;
 			}
@@ -614,8 +693,14 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			legalMoves = board.getLegalMoves(currentPlayer);
 			if(legalMoves == null) {
 				gameOver("RED has no moves. BLACK wins.");
-				firstAI.lostGame();
-				secondAI.wonGame();
+				if(!combatMode){
+					firstAI.lostGame();
+					secondAI.wonGame();
+				}
+				else {
+					firstCombatAI.lostGame();
+					secondCombatAI.wonGame();
+				}
 				winner = 2;
 				return;
 			}
@@ -1065,7 +1150,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		ArrayList<CheckersMove> p1 = new ArrayList<CheckersMove>();
 		ArrayList<CheckersMove> p2 = new ArrayList<CheckersMove>();
 		CheckersData copy = new CheckersData();
-		copy.setUpGame(board.getBoardCopy());
+		copy.setUpGame(board);
 		copy.makeMove(move);
 		if(currentPlayer == firstAI.player) {
 			p1.add(move);
