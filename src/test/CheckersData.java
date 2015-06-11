@@ -35,7 +35,7 @@ class CheckersData {
 	HEIGHT = 8,
 	WIDTH = 8;
 	
-	public PowerUpSystem powerUpSys;
+	public static PowerUpSystem powerUpSys;
 
 	private int[][] board;  // board[r][c] is the contents of row r, column c.  
 
@@ -49,6 +49,29 @@ class CheckersData {
 		BLACK_KINGS = 0;
 		powerUpSys = new PowerUpSystem();
 		setUpGame();
+	}
+	
+	public void recount() {
+		RED_MEN = 0;
+		BLACK_MEN = 0;
+		RED_KINGS = 0;
+		BLACK_KINGS = 0;
+		for(int i = 0; i < 8; i++)
+			for(int j = 0; j < 8; j++)
+				switch(board[i][j]%10) {
+				case RED:
+					RED_MEN++;
+					break;
+				case BLACK:
+					BLACK_MEN++;
+					break;
+				case RED_KING:
+					RED_KINGS++;
+					break;
+				case BLACK_KING:
+					BLACK_KINGS++;
+					break;
+				}
 	}
 
 	public String hash() {
@@ -251,13 +274,25 @@ class CheckersData {
 		// piece becomes a king.
 		
 		
-//		if(power) {
-//			int piece = board[toRow][toCol] % 10;
-//			
-//			
-//			
-//		}
-//		else {
+		if(power) {
+			int piece = board[fromRow][fromCol] % 10;
+			PowerUp p = null;
+
+			switch (piece) {
+				case RED:
+				case RED_KING:
+					p = powerUpSys.red_powers.get(new Point(fromRow, fromCol));
+					break;
+				case BLACK:
+				case BLACK_KING:
+					p = powerUpSys.blk_powers.get(new Point(fromRow, fromCol));
+					break;
+			}
+			p.execute(board, new Point(toRow, toCol));
+			recount();
+			
+		}
+		else {
 			int target = board[toRow][toCol];	// Value of space a piece moved to
 			int powerPiece = board[fromRow][fromCol]/10;
 			
@@ -298,7 +333,7 @@ class CheckersData {
 				// Generate random PowerUp of pType
 				powerUpSys.listPowerUp(new Point(toCol,toRow), piece, powerUpSys.getRandomPowerUp(pType));
 			}
-//		}
+		}
 	}
 
 
@@ -350,13 +385,14 @@ class CheckersData {
 		move in each of the four directions from that square.  If there is 
 		a legal move in that direction, put it in the moves vector.
 	*/
-		int powerMan = 10 + player;
-		int powerKing = 10 + playerKing;
+
 		
 		if (moves.size() == 0) {
+			int powerMan = 10 + player;
+			int powerKing = 10 + playerKing;
 			for (int row = 0; row < 8; row++) {
 				for (int col = 0; col < 8; col++) {
-					if (board[row][col]%10 == player || board[row][col]%10 == playerKing) {
+					if (board[row][col] == player || board[row][col] == playerKing) {
 						if (canMove(player,row,col,row+1,col+1))
 							moves.addElement(new CheckersMove(row,col,row+1,col+1, false));
 						if (canMove(player,row,col,row-1,col+1))

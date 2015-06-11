@@ -64,6 +64,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	double[] w3 = {0.25, 0.4, 0.15, 0.2};
 	double[] w4 = {0.2, 0.5, 0.1, 0.2};
 	
+	
 	public CheckersCanvas() {
 		setBackground(Color.black);
 		addMouseListener(this);
