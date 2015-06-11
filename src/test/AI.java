@@ -1,5 +1,6 @@
 package test;
 
+import java.awt.Point;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -157,19 +158,43 @@ public class AI {
 		if(currentMoves == null)
 			return null;
 		
-		int max_index = -1;		
+		CheckersMove finalMove = null;
 		double alpha = MINUS_INFINITY;
 		double beta = PLUS_INFINITY;
 		int len = currentMoves.length;
 		int[][] boardCopy = currentBoard.getBoardCopy();
 		CheckersData copy = new CheckersData();
+		int powMoveTracker = 0;
+		
 		for(int i = 0; i < len; i++) {
 			// try initial moves on the board, see what will be best.
-
-			copy.setUpGame(boardCopy);
-			copy.makeMove(currentMoves[i]);
-			String key = copy.hash();
 			boolean badMove = false;
+			copy.setUpGame(boardCopy);
+			CheckersMove moveToMake = null;
+			if(currentMoves[i].isPower() && !currentMoves[i].isJump()) {
+				--i;
+				PowerUp p = null;
+				int row = currentMoves[i].fromRow;
+				int col = currentMoves[i].fromCol;
+				switch(player) {
+				case CheckersData.RED:
+					p = CheckersData.powerUpSys.red_powers.get(new Point(row, col));
+					break;
+				case CheckersData.BLACK:
+					p = CheckersData.powerUpSys.blk_powers.get(new Point(row, col));
+					break;
+				}
+				CheckersMove[] powMoves = p.moves(boardCopy, new Point(row, col));
+				if(powMoveTracker <  powMoves.length) {
+					moveToMake = powMoves[powMoveTracker];
+					powMoveTracker++;
+				}
+				else { i++; powMoveTracker = 0; }
+			}
+			if(moveToMake == null)
+				moveToMake = currentMoves[i];
+			copy.makeMove(moveToMake);
+			String key = copy.hash();
 			// check to see if the AI has seen this move before
 			if(weightedMoves.containsKey(key)) {
 				int weight = weightedMoves.get(key);
@@ -184,18 +209,19 @@ public class AI {
 					return currentMoves[i];
 				}
 			}
+			
 			// if the move was not found in memory, we do alpha-beta pruning
 			if(!badMove) {
 				double temp;
 				// do something special if the move is a jump and there's only one of them.
-				if(currentMoves[i].isJump())
-					temp = moveHelper(copy, alpha, beta, true, 0);
-				else
-					temp = moveHelper(copy, alpha, beta, false, 0);
+					if(moveToMake.isJump())
+						temp = moveHelper(copy, alpha, beta, true, 0);
+					else
+						temp = moveHelper(copy, alpha, beta, false, 0);
 
 				if(alpha < temp) {
 					alpha = temp;
-					max_index = i;
+					finalMove = moveToMake;
 				}
 			}
 		} // end loop
@@ -213,14 +239,13 @@ public class AI {
 		// remember the last board played on and the last move made
 		lastBoard = new CheckersData();
 		lastBoard.setUpGame(currentBoard.getBoardCopy());
-		lastMove = currentMoves[max_index];
+		lastMove = finalMove;
 //		weightedMoves.put(lastBoard.hash(), GOOD_MOVE);
 		return lastMove;
 
 	} // end makeMove()
 
-
-
+	
 	// recursive move maker. Alpha-Beta pruning happens in here.
 	private double moveHelper(CheckersData board, double alpha, double beta, boolean MAX, int level) {
 		level++;
@@ -249,10 +274,34 @@ public class AI {
 
 		int[][] boardCopy = board.getBoardCopy();
 		CheckersData copy = new CheckersData();
+		int powMoveTracker = 0;
 		for(int i = 0; i < currentMoves.length; i++) {
 			if(alpha < beta) {
+				CheckersMove moveToMake = null;
 				copy.setUpGame(boardCopy);
-				copy.makeMove(currentMoves[i]);
+				if(currentMoves[i].isPower() && !currentMoves[i].isJump()) {
+					--i;
+					PowerUp p = null;
+					int row = currentMoves[i].fromRow;
+					int col = currentMoves[i].fromCol;
+					switch(player) {
+					case CheckersData.RED:
+						p = CheckersData.powerUpSys.red_powers.get(new Point(row, col));
+						break;
+					case CheckersData.BLACK:
+						p = CheckersData.powerUpSys.blk_powers.get(new Point(row, col));
+						break;
+					}
+					CheckersMove[] powMoves = p.moves(boardCopy, new Point(row, col));
+					if(powMoveTracker <  powMoves.length) {
+						moveToMake = powMoves[powMoveTracker];
+						powMoveTracker++;
+					}
+					else { i++; powMoveTracker = 0; }
+				}
+				if(moveToMake == null)
+					moveToMake = currentMoves[i];
+				copy.makeMove(moveToMake);
 
 				double temp = 0.0;
 				if(MAX) {
@@ -289,7 +338,7 @@ public class AI {
 					}
 				}
 				else { // not MAX's turn
-					if(currentMoves[i].isJump())
+					if(moveToMake.isJump())
 						temp = moveHelper(copy, alpha, beta, MAX, (level-1));
 					else
 						temp = moveHelper(copy, alpha, beta, !MAX, level);
@@ -316,13 +365,24 @@ public class AI {
 		double distance = DistanceHeuristic.calc(board, p, MAX); // gets average distance
 		double move = MoveDifferenceHeuristic.calc(board, p, MAX);
 		double piece = PieceDifferenceHeuristic.calc(board, p, MAX);
+		double numPow = PowerUpNumHeuristic.calc(board, p, MAX);
 		
 		if(distance != 0.0)
 			distance = 1/distance;
-		if(CheckersCanvas.turnNumber < late_game)
-			eval = WEIGHT_VECTOR[0]*move + WEIGHT_VECTOR[1]*piece + WEIGHT_VECTOR[2]*distance + WEIGHT_VECTOR[3]*protect;
-		else
-			eval = WEIGHT_VECTOR_2[0]*move + WEIGHT_VECTOR_2[1]*piece + WEIGHT_VECTOR_2[2]*distance + WEIGHT_VECTOR_2[3]*protect;
+		if(!isCombat) {
+			if(CheckersCanvas.turnNumber < late_game)
+				eval = WEIGHT_VECTOR[0]*move + WEIGHT_VECTOR[1]*piece + WEIGHT_VECTOR[2]*distance + WEIGHT_VECTOR[3]*protect;
+			else
+				eval = WEIGHT_VECTOR_2[0]*move + WEIGHT_VECTOR_2[1]*piece + WEIGHT_VECTOR_2[2]*distance + WEIGHT_VECTOR_2[3]*protect;
+		}
+		else {
+			if(CheckersCanvas.turnNumber < late_game)
+				eval = WEIGHT_VECTOR[0]*move + WEIGHT_VECTOR[1]*piece + WEIGHT_VECTOR[2]*distance
+						+ WEIGHT_VECTOR[3]*protect + WEIGHT_VECTOR[4]*numPow;
+			else
+				eval = WEIGHT_VECTOR_2[0]*move + WEIGHT_VECTOR_2[1]*piece + WEIGHT_VECTOR_2[2]*distance
+						+ WEIGHT_VECTOR_2[3]*protect + WEIGHT_VECTOR_2[4]*numPow;
+		}
 		
 
 		return eval;
