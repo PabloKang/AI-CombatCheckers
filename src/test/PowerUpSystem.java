@@ -142,7 +142,7 @@ class PowerUpSystem {
 				int col = rand.nextInt(CheckersData.WIDTH-1);
 				if(row % 2 == col % 2 && board[row][col] == CheckersData.EMPTY){
 					board[row][col] = pSelector.randomType()*10;
-					System.out.println("Spawned PowerUp at [" + row + "]["+col+"]");
+//					System.out.println("Spawned PowerUp at [" + row + "]["+col+"]");
 					powerSpawned = true;
 					break;
 				}
@@ -173,9 +173,9 @@ class PowerUpSelector {
     PowerUpSelector() 
     {
     	types.add(new Weapon(100));
-    	weapons.add(new Laser(60));
-    	weapons.add(new Bomb(30));
-    	weapons.add(new AirStrike(10));
+    	weapons.add(new Laser(45));
+    	weapons.add(new Bomb(40));
+    	weapons.add(new AirStrike(15));
     }
 
     
