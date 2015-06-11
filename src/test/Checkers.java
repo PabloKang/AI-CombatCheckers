@@ -39,6 +39,8 @@ public class Checkers extends JPanel {
 			public void windowClosing (java.awt.event.WindowEvent evt) {
 				if(CheckersCanvas.firstAI != null) CheckersCanvas.firstAI.dumpToFile();
 				if(CheckersCanvas.secondAI != null) CheckersCanvas.secondAI.dumpToFile();
+				if(CheckersCanvas.firstCombatAI != null) CheckersCanvas.firstCombatAI.dumpToFile();
+				if(CheckersCanvas.secondCombatAI != null) CheckersCanvas.secondCombatAI.dumpToFile();
 			}
 		});
 
