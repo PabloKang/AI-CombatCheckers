@@ -75,11 +75,13 @@ class PowerUpSystem {
 		
 		if(userPiece == CheckersData.BLACK || userPiece == CheckersData.BLACK_KING ) {
 			pUp = blk_powers.remove(user);
-			blk_powers.put(destination, pUp);
+			if (pUp != null)
+				blk_powers.put(destination, pUp);
 		}
 		else if(userPiece == CheckersData.RED || userPiece == CheckersData.RED_KING ) {
 			pUp = red_powers.remove(user);
-			red_powers.put(destination, pUp);
+			if (pUp != null)
+				red_powers.put(destination, pUp);
 		}
 	}
 	
