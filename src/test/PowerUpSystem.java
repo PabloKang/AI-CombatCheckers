@@ -53,8 +53,8 @@ class PowerUpSystem {
 	
 	public PowerUpSystem getCopy() {
 		PowerUpSystem pow = new PowerUpSystem();
-		pow.blk_powers = blk_powers;
-		pow.red_powers = red_powers;
+		pow.blk_powers = new HashMap<>(blk_powers);
+		pow.red_powers = new HashMap<>(red_powers);
 		return pow;
 	}
 	

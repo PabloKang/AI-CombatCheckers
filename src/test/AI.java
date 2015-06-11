@@ -194,8 +194,10 @@ public class AI {
 					else { i++; powMoveTracker = 0; }
 				}
 			}
-			if(moveToMake == null)
+			if(moveToMake == null) {
+				while (i > currentMoves.length - 1) --i;
 				moveToMake = currentMoves[i];
+			}
 			copy.makeMove(moveToMake);
 			String key = copy.hash();
 			// check to see if the AI has seen this move before
