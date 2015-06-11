@@ -293,28 +293,29 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			gameOver("RED resigns. BLACK wins.");
 		else
 			gameOver("BLACK resigns. RED wins.");
-		
-		if(currentPlayer == firstAI.player) {
-			if(!combatMode) {
+		if(!combatMode) {
+			if(currentPlayer == firstAI.player) {
 				firstAI.lostGame();
 				secondAI.wonGame();
+				winner = 2;
 			}
 			else {
-				firstCombatAI.lostGame();
-				secondCombatAI.wonGame();
+				firstAI.wonGame();
+				secondAI.lostGame();
+				winner = 1;
 			}
-			winner = 2;
 		}
 		else {
-			if(!combatMode) {
-				secondAI.lostGame();
-				firstAI.wonGame();
+			if(currentPlayer == firstCombatAI.player) {
+				firstCombatAI.lostGame();
+				secondCombatAI.wonGame();
+				winner = 2;
 			}
 			else {
-				secondCombatAI.lostGame();
 				firstCombatAI.wonGame();
+				secondCombatAI.lostGame();
+				winner = 1;
 			}
-			winner = 1;
 		}
 		gameInProgress = false;
 	}
@@ -653,8 +654,8 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			doResignAIvsAI();
 			return;
 		}
-		if(turnNumber >= 50) {
-			if(drawDetection(move)) {
+		if(turnNumber >= 150) {
+			//if(drawDetection(move)) {
 				gameOver("Game is a draw.");
 				if(!combatMode) {
 					firstAI.drawGame();
@@ -667,7 +668,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				gameInProgress = false;
 				winner = 0;
 				return;
-			}
+			//}
 		}
 		board.makeMove(move);
 		if(move.isJump()) {
@@ -1095,6 +1096,56 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			e.printStackTrace();
 		}
 	}
+	
+	private void trainCombatAI() {
+		for(int i = 0; i < 500; i++) {
+			System.out.print("Red vs Random | i = ");
+			System.out.println(i);
+			while(gameInProgress) {
+				turnNumber++;
+				if(currentPlayer == firstCombatAI.player)
+					doMakeMoveAIvsAI(firstCombatAI.makeMove(board));
+				else
+					doMakeMoveAIvsAI(secondCombatAI.makeRandomMove(board));
+			}
+			outputResult(".\\data\\CRedvsRand.txt", 1);
+			doNewGame();
+			if(i%2 == 0)
+				currentPlayer = CheckersData.BLACK;
+		}
+		for(int i = 0; i < 500; i++) {
+			System.out.print("Random vs Black | i = ");
+			System.out.println(i);
+			while(gameInProgress) {
+				turnNumber++;
+				if(currentPlayer == firstCombatAI.player)
+					doMakeMoveAIvsAI(firstCombatAI.makeRandomMove(board));
+				else
+					doMakeMoveAIvsAI(secondCombatAI.makeMove(board));
+			}
+			outputResult(".\\data\\CRandvsBlack.txt", 2);
+			doNewGame();
+			if(i%2 == 0)
+				currentPlayer = CheckersData.BLACK;
+		}
+		for(int i = 0; i < 100; i++) {
+			System.out.print("Red vs Black | i = ");
+			System.out.println(i);
+			while(gameInProgress) {
+				turnNumber++;
+				if(currentPlayer == firstCombatAI.player)
+					doMakeMoveAIvsAI(firstCombatAI.makeMove(board));
+				else
+					doMakeMoveAIvsAI(secondCombatAI.makeMove(board));
+			}
+			outputResult(".\\data\\CRedvsBlack.txt", 0);
+			doNewGame();
+			if(i%2 == 0)
+				currentPlayer = CheckersData.BLACK;
+		}
+		System.out.println("done training");
+	}
+	
 	private void trainAI() {
 		for(int i = 0; i < 500; i++) {
 			System.out.print("Red vs Random | i = ");
@@ -1106,7 +1157,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				else
 					doMakeMoveAIvsAI(secondAI.makeRandomMove(board));
 			}
-			outputResult(System.getenv("APPDATA") + "\\Combat Checkers\\RedvsRand.txt", 1);
+			outputResult(".\\data\\RedvsRand.txt", 1);
 			doNewGame();
 			if(i%2 == 0)
 				currentPlayer = CheckersData.BLACK;
@@ -1121,7 +1172,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				else
 					doMakeMoveAIvsAI(secondAI.makeMove(board));
 			}
-			outputResult(System.getenv("APPDATA") + "\\Combat Checkers\\RandvsBlack.txt", 2);
+			outputResult(".\\data\\RandvsBlack.txt", 2);
 			doNewGame();
 			if(i%2 == 0)
 				currentPlayer = CheckersData.BLACK;
@@ -1136,7 +1187,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				else
 					doMakeMoveAIvsAI(secondAI.makeMove(board));
 			}
-			outputResult(System.getenv("APPDATA") + "\\Combat Checkers\\RedvsBlack.txt", 0);
+			outputResult(".\\data\\RedvsBlack.txt", 0);
 			doNewGame();
 			if(i%2 == 0)
 				currentPlayer = CheckersData.BLACK;

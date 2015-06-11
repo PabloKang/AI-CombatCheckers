@@ -28,7 +28,7 @@ public class AI {
 
 	public static final double PLUS_INFINITY = Double.MAX_VALUE;
 	public static final double MINUS_INFINITY = -1 * Double.MAX_VALUE;
-	private static final int LEVEL_LIMIT = 5;
+	private static final int LEVEL_LIMIT = 3;
 	private double WEIGHT_VECTOR[]; // {0.15, 0.4, 0.20, 0.25}; // { MoveDifferenceHeuristic, PieceDifferenceHeuristic, 
 																		//  Distance Heuristic, ProtectedPiecesHeuristic     }
 	private double WEIGHT_VECTOR_2[]; // {0.15, 0.7, 0.05, 0.1};
@@ -148,7 +148,30 @@ public class AI {
 		isRandom = true;
 		CheckersMove[] currentMoves = currentBoard.getLegalMoves(player);
 		int move = new Random().nextInt(currentMoves.length);
-		return currentMoves[move];
+		CheckersMove moveToMake = currentMoves[move];
+		if(isCombat) {
+			if(moveToMake.isPower() && !moveToMake.isJump()) {
+				PowerUp p = null;
+				int row = moveToMake.fromRow;
+				int col = moveToMake.fromCol;
+				switch(player) {
+				case CheckersData.RED:
+					p = currentBoard.powerUpSys.red_powers.get(new Point(col, row));
+					break;
+				case CheckersData.BLACK:
+					p = currentBoard.powerUpSys.blk_powers.get(new Point(col, row));
+					break;
+				}
+				if(p != null) {
+					currentMoves = p.moves(currentBoard.getBoardCopy(), new Point(col, row));
+					if(currentMoves != null && currentMoves.length > 0) {
+						move = new Random().nextInt(currentMoves.length);
+						moveToMake = currentMoves[move];
+					}
+				}
+			}
+		}
+		return moveToMake;
 	}
 	
 	// Returns the AI's move for the turn.
@@ -291,14 +314,14 @@ public class AI {
 					int col = currentMoves[i].fromCol;
 					switch(player) {
 					case CheckersData.RED:
-						p = CheckersData.powerUpSys.red_powers.get(new Point(col,row));
+						p = copy.powerUpSys.red_powers.get(new Point(col,row));
 						break;
 					case CheckersData.BLACK:
-						p = CheckersData.powerUpSys.blk_powers.get(new Point(col, row));
+						p = copy.powerUpSys.blk_powers.get(new Point(col, row));
 						break;
 					}
 					if(p != null) {
-						CheckersMove[] powMoves = p.moves(boardCopy, new Point(col, row));
+						CheckersMove[] powMoves = p.moves(copy.getBoardCopy(), new Point(col, row));
 						if(powMoveTracker <  powMoves.length) {
 							--i;
 							moveToMake = powMoves[powMoveTracker];

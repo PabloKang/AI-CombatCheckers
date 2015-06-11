@@ -23,7 +23,7 @@ public class Weapon extends PowerUp {
 	@Override
 	public int[][] execute(int[][] board, Point target) 
 	{
-		System.out.println(type + " -> " + target.x + "," + target.y);
+//		System.out.println(type + " -> " + target.x + "," + target.y);
 
 		// Kill the target
 		board[target.y][target.x] = CheckersData.EMPTY;	
@@ -117,13 +117,13 @@ class Bomb extends Weapon
 		if(p.y > 0 && p.x > 0) { 						// Top left
 			board[p.y-1][p.x-1] = CheckersData.EMPTY;
 		}
-		if(p.y < 8 && p.x > 0) { 				// Top right
+		if(p.y < 7 && p.x > 0) { 				// Top right
 			board[p.y+1][p.x-1] = CheckersData.EMPTY;
 		}
-		if(p.y > 0 && p.x < 8) { 			// Bottom left
+		if(p.y > 0 && p.x < 7) { 			// Bottom left
 			board[p.y-1][p.x+1] = CheckersData.EMPTY;
 		}
-		if(p.y < 8 && p.x < 8) { 	// Bottom right
+		if(p.y < 7 && p.x < 7) { 	// Bottom right
 			board[p.y+1][p.x+1] = CheckersData.EMPTY;
 		}
 		
