@@ -23,6 +23,8 @@ public class Weapon extends PowerUp {
 	@Override
 	public int[][] execute(int[][] board, Point target) 
 	{
+		System.out.println(type + " -> " + target.x + "," + target.y);
+
 		// Kill the target
 		board[target.y][target.x] = CheckersData.EMPTY;	
 		
@@ -59,12 +61,10 @@ class Laser extends Weapon
 					int yj = y + j;
 
 					while (xi < 8 && xi >= 0 && yj < 8 && yj >= 0) {
-						System.out.println("checking (" + xi + "," + yj + ")");
 						pCode = CheckersData.parsePiece(board[yj][xi]);
 
 						if (pCode != CheckersData.EMPTY) {
 							laserMoveList.add(new CheckersMove(user.y, user.x, yj, xi, true));
-							System.out.println("new laser target: (" + xi + "," + yj + ")");
 							break;
 						} else {
 							xi += i;
