@@ -291,6 +291,7 @@ class CheckersData {
 			p.execute(board, new Point(toRow, toCol));
 			recount();
 			
+			
 		}
 		else {
 			int target = board[toRow][toCol];	// Value of space a piece moved to
@@ -392,7 +393,7 @@ class CheckersData {
 			int powerKing = 10 + playerKing;
 			for (int row = 0; row < 8; row++) {
 				for (int col = 0; col < 8; col++) {
-					if (board[row][col] == player || board[row][col] == playerKing) {
+					if (board[row][col]%10 == player || board[row][col]%10 == playerKing) {
 						if (canMove(player,row,col,row+1,col+1))
 							moves.addElement(new CheckersMove(row,col,row+1,col+1, false));
 						if (canMove(player,row,col,row-1,col+1))
@@ -402,7 +403,7 @@ class CheckersData {
 						if (canMove(player,row,col,row-1,col-1))
 							moves.addElement(new CheckersMove(row,col,row-1,col-1, false));
 					}
-					else if(board[row][col] == powerMan || board[row][col] == powerKing) {
+					if(board[row][col] == powerMan || board[row][col] == powerKing) {
 						moves.addElement(new CheckersMove(row, col, row, col, true));
 					}
 				}
