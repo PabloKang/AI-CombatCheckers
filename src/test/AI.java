@@ -162,34 +162,37 @@ public class AI {
 		double alpha = MINUS_INFINITY;
 		double beta = PLUS_INFINITY;
 		int len = currentMoves.length;
-		int[][] boardCopy = currentBoard.getBoardCopy();
+		//int[][] boardCopy = currentBoard.getBoardCopy();
 		CheckersData copy = new CheckersData();
 		int powMoveTracker = 0;
 		
 		for(int i = 0; i < len; i++) {
 			// try initial moves on the board, see what will be best.
 			boolean badMove = false;
-			copy.setUpGame(boardCopy);
+			copy.setUpGame(currentBoard);
 			CheckersMove moveToMake = null;
 			if(currentMoves[i].isPower() && !currentMoves[i].isJump()) {
-				--i;
+				
 				PowerUp p = null;
 				int row = currentMoves[i].fromRow;
 				int col = currentMoves[i].fromCol;
 				switch(player) {
 				case CheckersData.RED:
-					p = CheckersData.powerUpSys.red_powers.get(new Point(row, col));
+					p = copy.powerUpSys.red_powers.get(new Point(col, row));
 					break;
 				case CheckersData.BLACK:
-					p = CheckersData.powerUpSys.blk_powers.get(new Point(row, col));
+					p = copy.powerUpSys.blk_powers.get(new Point(col, row));
 					break;
 				}
-				CheckersMove[] powMoves = p.moves(boardCopy, new Point(row, col));
-				if(powMoveTracker <  powMoves.length) {
-					moveToMake = powMoves[powMoveTracker];
-					powMoveTracker++;
+				if(p != null) {
+					CheckersMove[] powMoves = p.moves(copy.getBoardCopy(), new Point(col, row));
+					if(powMoveTracker <  powMoves.length) {
+						--i;
+						moveToMake = powMoves[powMoveTracker];
+						powMoveTracker++;
+					}
+					else { i++; powMoveTracker = 0; }
 				}
-				else { i++; powMoveTracker = 0; }
 			}
 			if(moveToMake == null)
 				moveToMake = currentMoves[i];
@@ -238,7 +241,7 @@ public class AI {
 
 		// remember the last board played on and the last move made
 		lastBoard = new CheckersData();
-		lastBoard.setUpGame(currentBoard.getBoardCopy());
+		lastBoard.setUpGame(currentBoard);
 		lastMove = finalMove;
 //		weightedMoves.put(lastBoard.hash(), GOOD_MOVE);
 		return lastMove;
@@ -267,40 +270,45 @@ public class AI {
 		
 		if(level > LEVEL_LIMIT) {
 			CheckersData copy = new CheckersData();
-			copy.setUpGame(board.getBoardCopy());
+			copy.setUpGame(board);
 			return evaluateBoard(copy, MAX);
 		}
 
 
-		int[][] boardCopy = board.getBoardCopy();
+		//int[][] boardCopy = board.getBoardCopy();
 		CheckersData copy = new CheckersData();
 		int powMoveTracker = 0;
 		for(int i = 0; i < currentMoves.length; i++) {
 			if(alpha < beta) {
 				CheckersMove moveToMake = null;
-				copy.setUpGame(boardCopy);
-				if(currentMoves[i].isPower() && !currentMoves[i].isJump()) {
-					--i;
+				copy.setUpGame(board);
+				/*if(currentMoves[i].isPower() && !currentMoves[i].isJump()) {
+					
 					PowerUp p = null;
 					int row = currentMoves[i].fromRow;
 					int col = currentMoves[i].fromCol;
 					switch(player) {
 					case CheckersData.RED:
-						p = CheckersData.powerUpSys.red_powers.get(new Point(row, col));
+						p = CheckersData.powerUpSys.red_powers.get(new Point(col,row));
 						break;
 					case CheckersData.BLACK:
-						p = CheckersData.powerUpSys.blk_powers.get(new Point(row, col));
+						p = CheckersData.powerUpSys.blk_powers.get(new Point(col, row));
 						break;
 					}
-					CheckersMove[] powMoves = p.moves(boardCopy, new Point(row, col));
-					if(powMoveTracker <  powMoves.length) {
-						moveToMake = powMoves[powMoveTracker];
-						powMoveTracker++;
+					if(p != null) {
+						CheckersMove[] powMoves = p.moves(boardCopy, new Point(col, row));
+						if(powMoveTracker <  powMoves.length) {
+							--i;
+							moveToMake = powMoves[powMoveTracker];
+							powMoveTracker++;
+						}
+						else { i++; powMoveTracker = 0; }
 					}
-					else { i++; powMoveTracker = 0; }
+				}*/
+				if(moveToMake == null) {
+					moveToMake = new CheckersMove(currentMoves[i].fromRow, currentMoves[i].fromCol,
+							currentMoves[i].toRow, currentMoves[i].toCol, false);
 				}
-				if(moveToMake == null)
-					moveToMake = currentMoves[i];
 				copy.makeMove(moveToMake);
 
 				double temp = 0.0;
