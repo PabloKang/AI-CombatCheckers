@@ -109,6 +109,12 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	}
 	
 	public void setupGame() {
+		if (usingPowerUp) {
+			usingPowerUp = false;
+			cancelPowerUp();
+			hidePowerUpInfo();
+		}
+
 		String[] modes = {"Combat", "Normal"};
 		String mode = (String) JOptionPane.showInputDialog(null, "Mode:", "Setup", JOptionPane.QUESTION_MESSAGE, null, modes, modes[0]);
 
@@ -204,12 +210,15 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		newGameButton.setEnabled(false);
 		resignButton.setEnabled(true);
 		repaint();
-		if(!combatMode) 
-			if(firstAI.player == currentPlayer)
+		if(!combatMode) {
+			if (firstAI.player == currentPlayer) {
 				doMakeMoveAI(firstAI.makeMove(board));
-		else
-			if(firstCombatAI.player == currentPlayer)
+			}
+		} else {
+			if (firstCombatAI.player == currentPlayer) {
 				doMakeMoveAI(firstCombatAI.makeMove(board));
+			}
+		}
 	}
 
 	void doNewAIvsAIGame() {
@@ -261,16 +270,21 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			gameOver("RED resigns.  BLACK wins.");
 		else
 			gameOver("BLACK resigns.  RED wins.");
-		if(currentPlayer == firstAI.player)
-			if(!combatMode)
+
+		if (!combatMode) {
+			if (currentPlayer == firstAI.player) {
 				firstAI.lostGame();
-			else
-				firstCombatAI.lostGame();
-		else
-			if(!combatMode)
+			} else {
 				firstAI.wonGame();
-			else
+			}
+		} else {
+			if (currentPlayer == firstCombatAI.player) {
+				firstCombatAI.lostGame();
+			} else {
 				firstCombatAI.wonGame();
+			}
+		}
+
 		gameInProgress = false;
 	}
 
@@ -313,21 +327,21 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		newGameButton.setEnabled(true);
 		resignButton.setEnabled(false);
 		gameInProgress = false;
+		if (usingPowerUp) {
+			usingPowerUp = false;
+			cancelPowerUp();
+			hidePowerUpInfo();
+		}
 		repaint();
 	}
 	
 	
 	void doClickSquare(int row, int col) {
 		if (usingPowerUp) {
-			System.out.println("Chosen target: (" + col + "," + row + ")");
 			CheckersMove[] moves = selectedPowerUp.moves(board.getBoardCopy(), new Point(powerUpCol, powerUpRow));
-			System.out.println(moves.length + " moves");
 
 			for (int i = 0; i < moves.length; i++) {
-				System.out.println("(" + moves[i].fromCol + "," + moves[i].fromRow + ") -> (" + moves[i].toCol + "," + moves[i].toRow + ")");
 				if (moves[i].fromRow == selectedRow && moves[i].fromCol == selectedCol && moves[i].toRow == row && moves[i].toCol == col) {
-					System.out.println("move valid");
-
 					if (!vsAI)
 						doMakeMove(moves[i]);
 					else
@@ -460,6 +474,12 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 	}  // end doMakeMove();
 
 	void doMakeMoveAI(CheckersMove move) {
+		if (usingPowerUp) {
+			usingPowerUp = false;
+			cancelPowerUp();
+			hidePowerUpInfo();
+		}
+
 		turnNumber++;
 		
 		// Check if PowerUp needs to spawn
@@ -591,7 +611,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		while(gameInProgress) {
 			repaint();
 			try {
-				Thread.sleep(500);
+				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -628,8 +648,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		// Check if PowerUp needs to spawn
 		if (combatMode)
 			board.setUpGame(board.powerUpSys.spawnPowerUp(board.getBoardCopy()));
-		
-		System.out.println("Game still happening");
+
 		if(move == null) {
 			doResignAIvsAI();
 			return;
