@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -16,14 +15,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-
-import javafx.application.Application;
-import javafx.util.Pair;
 
 
 class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
@@ -34,6 +28,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 
 	JLabel message;
 	JLabel powerUpLabel;
+	JLabel powerUpImage;
 
 	JPanel powerUpPanel;
 
@@ -78,7 +73,8 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		newGameButton.addActionListener(this);
 
 		powerUpPanel = new JPanel();
-		powerUpLabel = new JLabel("No power-up selected", JLabel.CENTER);
+		powerUpLabel = new JLabel(" ", JLabel.CENTER);
+		powerUpImage = new JLabel("No power-up selected", JLabel.CENTER);
 		powerUpButton = new JButton("Use");
 		powerUpButton.setEnabled(false);
 
@@ -329,7 +325,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		
 		// Check if PowerUp needs to spawn
 		if (combatMode)
-			board = board.powerUpSys.spawnPowerUp(board);
+			board.setUpGame(board.powerUpSys.spawnPowerUp(board.getBoardCopy()));
 		
 		/* If the move was a jump, it's possible that the player has another
 		jump.  Check for legal jumps starting from the square that the player
@@ -407,7 +403,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		
 		// Check if PowerUp needs to spawn
 		if (combatMode)
-			board = board.powerUpSys.spawnPowerUp(board);
+			board.setUpGame(board.powerUpSys.spawnPowerUp(board.getBoardCopy()));
 		
 		if(currentPlayer == firstAI.player && move == null) {
 			doResignAI();
@@ -529,7 +525,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		
 		// Check if PowerUp needs to spawn
 		if (combatMode)
-			board = board.powerUpSys.spawnPowerUp(board);
+			board.setUpGame(board.powerUpSys.spawnPowerUp(board.getBoardCopy()));
 		
 		System.out.println("Game still happening");
 		if(move == null) {
@@ -644,7 +640,7 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 			if (selectedRow >= 0) {
 				drawHighlight(g2D, Color.white, selectedCol, selectedRow);
 				if (CheckersData.parsePowerType(board.pieceAt(selectedRow, selectedCol)) > 0) {
-					displayPowerUpInfo(board.pieceAt(selectedRow, selectedCol));
+					displayPowerUpInfo(selectedCol, selectedRow);
 				} else {
 					hidePowerUpInfo();
 				}
@@ -771,8 +767,11 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 		g.draw(new Rectangle2D.Double(x + xOffset, y + yOffset, length - 1, length - 1));
 	}
 
-	private void displayPowerUpInfo(int code) {
+	private void displayPowerUpInfo(int col, int row) {
+		int code = board.pieceAt(row, col);
+
 		String powerType = "none";
+		PowerUp power = null;
 
 		switch (CheckersData.parsePowerType(code)) {
 			case 1:
@@ -786,14 +785,27 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				break;
 		}
 
-		powerUpLabel.setText("");
-		powerUpLabel.setIcon(new ImageIcon(resizeImage(images.get(powerType + "_open"), 128, 128)));
-		powerUpButton.setEnabled(true);
+		switch (currentPlayer) {
+			case CheckersData.RED:
+				power = board.powerUpSys.red_powers.get(new Point(col, row));
+				break;
+			case CheckersData.BLACK:
+				power = board.powerUpSys.blk_powers.get(new Point(col, row));
+				break;
+		}
+
+		if (power != null) {
+			powerUpLabel.setText(CheckersCanvas.toTitleCase(power.type));
+			powerUpImage.setText("");
+			powerUpImage.setIcon(new ImageIcon(resizeImage(images.get(powerType + "_open"), 128, 128)));
+			powerUpButton.setEnabled(true);
+		}
 	}
 
 	private void hidePowerUpInfo() {
-		powerUpLabel.setIcon(null);
-		powerUpLabel.setText("No power-up selected");
+		powerUpLabel.setText(" ");
+		powerUpImage.setIcon(null);
+		powerUpImage.setText("No power-up selected");
 		powerUpButton.setEnabled(false);
 	}
 
@@ -942,6 +954,26 @@ class CheckersCanvas extends Canvas implements ActionListener, MouseListener {
 				currentPlayer = CheckersData.BLACK;
 		}
 		System.out.println("done training");
+	}
+
+	public static String toTitleCase(String input) {
+		StringBuilder titleCase = new StringBuilder();
+		boolean nextTitleCase = true;
+
+		for (char c : input.toCharArray()) {
+			if (Character.isSpaceChar(c)) {
+				nextTitleCase = true;
+			} else if (nextTitleCase) {
+				c = Character.toTitleCase(c);
+				nextTitleCase = false;
+			} else {
+				c = Character.toLowerCase(c);
+			}
+
+			titleCase.append(c);
+		}
+
+		return titleCase.toString();
 	}
 
 	
