@@ -63,7 +63,7 @@ public class Checkers extends JPanel {
 		c.gridx = 0;
 		c.gridy = 0;
 		c.gridwidth = 1;
-		c.gridheight = 4;
+		c.gridheight = 3;
 		c.insets = new Insets(5, 5, 5, 5);
 		c.weightx = 1;
 		c.weighty = 1;
@@ -100,18 +100,20 @@ public class Checkers extends JPanel {
 		c.weighty = 0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		board.powerUpPanel.setLayout(new BoxLayout(board.powerUpPanel, BoxLayout.Y_AXIS));
-		board.powerUpLabel.setMinimumSize(new Dimension(128, 128));
-		board.powerUpLabel.setPreferredSize(new Dimension(128, 128));
-		board.powerUpLabel.setMaximumSize(new Dimension(128, 128));
 		board.powerUpLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		board.powerUpImage.setMinimumSize(new Dimension(128, 128));
+		board.powerUpImage.setPreferredSize(new Dimension(128, 128));
+		board.powerUpImage.setMaximumSize(new Dimension(128, 128));
+		board.powerUpImage.setAlignmentX(Component.CENTER_ALIGNMENT);
 		board.powerUpButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		board.powerUpButton.setBackground(new Color(238, 238, 238));
 		board.powerUpPanel.add(board.powerUpLabel);
+		board.powerUpPanel.add(board.powerUpImage);
 		board.powerUpPanel.add(board.powerUpButton);
 		add(board.powerUpPanel, c);
 
 		c.gridx = 0;
-		c.gridy = 4;
+		c.gridy = 3;
 		c.gridwidth = 2;
 		c.gridheight = 1;
 		c.insets = new Insets(5, 0, 0, 0);
